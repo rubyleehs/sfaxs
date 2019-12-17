@@ -21,7 +21,7 @@ public class Game : MonoBehaviour
     {
         mRaycastHits = new RaycastHit[NumberOfRaycastHits];
         mMap = GetComponentInChildren<Environment>();
-        mCharacter = Instantiate(Character, transform); 
+        mCharacter = Instantiate(Character, transform);
         ShowMenu(true);
     }
 
@@ -29,16 +29,16 @@ public class Game : MonoBehaviour
     {
         // Check to see if the player has clicked a tile and if they have, try to find a path to that 
         // tile. If we find a path then the character will move along it to the clicked tile. 
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
             Ray screenClick = MainCamera.ScreenPointToRay(Input.mousePosition);
             int hits = Physics.RaycastNonAlloc(screenClick, mRaycastHits);
-            if( hits > 0)
+            if (hits > 0)
             {
                 EnvironmentTile tile = mRaycastHits[0].transform.GetComponent<EnvironmentTile>();
                 if (tile != null)
                 {
-                    List<EnvironmentTile> route = mMap.Solve(mCharacter.CurrentPosition, tile);
+                    List<EnvironmentTile> route = mMap.Solve(mCharacter.currentPosition, tile);
                     mCharacter.GoTo(route);
                 }
             }
@@ -52,7 +52,7 @@ public class Game : MonoBehaviour
             Menu.enabled = show;
             Hud.enabled = !show;
 
-            if( show )
+            if (show)
             {
                 mCharacter.transform.position = CharacterStart.position;
                 mCharacter.transform.rotation = CharacterStart.rotation;
@@ -62,7 +62,7 @@ public class Game : MonoBehaviour
             {
                 mCharacter.transform.position = mMap.Start.Position;
                 mCharacter.transform.rotation = Quaternion.identity;
-                mCharacter.CurrentPosition = mMap.Start;
+                mCharacter.currentPosition = mMap.Start;
             }
         }
     }

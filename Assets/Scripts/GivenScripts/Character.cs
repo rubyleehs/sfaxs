@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
-    [SerializeField] private float SingleNodeMoveTime = 0.5f;
+    [SerializeField] private float singleNodeMoveTime = 0.5f;
 
-    public EnvironmentTile CurrentPosition { get; set; }
+    public EnvironmentTile currentPosition { get; set; }
 
     private IEnumerator DoMove(Vector3 position, Vector3 destination)
     {
@@ -18,10 +18,10 @@ public class Character : MonoBehaviour
             Vector3 p = transform.position;
             float t = 0.0f;
 
-            while (t < SingleNodeMoveTime)
+            while (t < singleNodeMoveTime)
             {
                 t += Time.deltaTime;
-                p = Vector3.Lerp(position, destination, t / SingleNodeMoveTime);
+                p = Vector3.Lerp(position, destination, t / singleNodeMoveTime);
                 transform.position = p;
                 yield return null;
             }
@@ -33,12 +33,12 @@ public class Character : MonoBehaviour
         // Move through each tile in the given route
         if (route != null)
         {
-            Vector3 position = CurrentPosition.Position;
+            Vector3 position = currentPosition.position;
             for (int count = 0; count < route.Count; ++count)
             {
-                Vector3 next = route[count].Position;
+                Vector3 next = route[count].position;
                 yield return DoMove(position, next);
-                CurrentPosition = route[count];
+                currentPosition = route[count];
                 position = next;
             }
         }
