@@ -109,7 +109,7 @@ public class Pathfinder : MonoBehaviour
                 result = new List<IPathfinderNode>();
                 result.Add(begin);
                 result.Add(destination);
-                Debug.LogFormat("Direct Connection: {0} <-> {1} {2} long", begin, destination, tileSize);
+                Debug.LogFormat("Direct Connection: {0} <-> {1} found", begin, destination);
             }
         }
         else

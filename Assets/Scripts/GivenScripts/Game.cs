@@ -5,23 +5,23 @@ using UnityEngine.EventSystems;
 
 public class Game : MonoBehaviour
 {
-    [SerializeField] private Camera MainCamera;
-    [SerializeField] private Character Character;
-    [SerializeField] private Canvas Menu;
-    [SerializeField] private Canvas Hud;
-    [SerializeField] private Transform CharacterStart;
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private Character character;
+    [SerializeField] private Canvas menu;
+    [SerializeField] private Canvas hud;
+    [SerializeField] private Transform characterStart;
 
     private RaycastHit[] mRaycastHits;
     private Character mCharacter;
     private Environment mMap;
 
-    private readonly int NumberOfRaycastHits = 1;
+    private readonly int numberOfRaycastHits = 1;
 
     void Start()
     {
-        mRaycastHits = new RaycastHit[NumberOfRaycastHits];
+        mRaycastHits = new RaycastHit[numberOfRaycastHits];
         mMap = GetComponentInChildren<Environment>();
-        mCharacter = Instantiate(Character, transform);
+        mCharacter = Instantiate(character, transform);
         ShowMenu(true);
     }
 
@@ -31,7 +31,7 @@ public class Game : MonoBehaviour
         // tile. If we find a path then the character will move along it to the clicked tile. 
         if (Input.GetMouseButtonDown(0))
         {
-            Ray screenClick = MainCamera.ScreenPointToRay(Input.mousePosition);
+            Ray screenClick = mainCamera.ScreenPointToRay(Input.mousePosition);
             int hits = Physics.RaycastNonAlloc(screenClick, mRaycastHits);
             if (hits > 0)
             {
@@ -47,20 +47,20 @@ public class Game : MonoBehaviour
 
     public void ShowMenu(bool show)
     {
-        if (Menu != null && Hud != null)
+        if (menu != null && hud != null)
         {
-            Menu.enabled = show;
-            Hud.enabled = !show;
+            menu.enabled = show;
+            hud.enabled = !show;
 
             if (show)
             {
-                mCharacter.transform.position = CharacterStart.position;
-                mCharacter.transform.rotation = CharacterStart.rotation;
+                mCharacter.transform.position = characterStart.position;
+                mCharacter.transform.rotation = characterStart.rotation;
                 mMap.CleanUpWorld();
             }
             else
             {
-                mCharacter.transform.position = mMap.Start.Position;
+                mCharacter.transform.position = mMap.Start.position;
                 mCharacter.transform.rotation = Quaternion.identity;
                 mCharacter.currentPosition = mMap.Start;
             }
@@ -75,7 +75,7 @@ public class Game : MonoBehaviour
     public void Exit()
     {
 #if !UNITY_EDITOR
-        Application.Quit();
+            Application.Quit();
 #endif
     }
 }

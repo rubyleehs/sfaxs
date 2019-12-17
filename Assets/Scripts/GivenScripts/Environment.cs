@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -142,26 +143,6 @@ public class Environment : MonoBehaviour
         }
     }
 
-    private float Distance(EnvironmentTile a, EnvironmentTile b)
-    {
-        // Use the length of the connection between these two nodes to find the distance, this 
-        // is used to calculate the local goal during the search for a path to a location
-        float result = float.MaxValue;
-        IPathfinderNode directConnection = a.connections.Find(c => c == b);
-        if (directConnection != null)
-        {
-            result = TileSize;
-        }
-        return result;
-    }
-
-    private float Heuristic(EnvironmentTile a, EnvironmentTile b)
-    {
-        // Use the locations of the node to estimate how close they are by line of sight
-        // experiment here with better ways of estimating the distance. This is used  to
-        // calculate the global goal and work out the best order to prossess nodes in
-        return Vector3.Distance(a.position, b.position);
-    }
 
     public void GenerateWorld()
     {
@@ -182,4 +163,31 @@ public class Environment : MonoBehaviour
             }
         }
     }
+
+    public List<EnvironmentTile> Solve(EnvironmentTile begin, EnvironmentTile destination)
+    {
+        return Pathfinder.Solve(mAll, begin, destination, (a, b) => Distance(a, b), (a, b) => Heuristic(a, b)).Cast<EnvironmentTile>().ToList();
+    }
+
+    private float Distance(IPathfinderNode a, IPathfinderNode b)
+    {
+        // Use the length of the connection between these two nodes to find the distance, this 
+        // is used to calculate the local goal during the search for a path to a location
+        float result = float.MaxValue;
+        IPathfinderNode directConnection = a.connections.Find(c => c == b);
+        if (directConnection != null)
+        {
+            result = TileSize;
+        }
+        return result;
+    }
+
+    private float Heuristic(IPathfinderNode a, IPathfinderNode b)
+    {
+        // Use the locations of the node to estimate how close they are by line of sight
+        // experiment here with better ways of estimating the distance. This is used  to
+        // calculate the global goal and work out the best order to prossess nodes in
+        return Vector3.Distance(a.position, b.position);
+    }
+
 }
