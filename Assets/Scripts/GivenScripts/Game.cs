@@ -17,35 +17,36 @@ public class Game : MonoBehaviour
 
     private readonly int numberOfRaycastHits = 1;
 
-    void Start()
+    void Start ()
     {
         mRaycastHits = new RaycastHit[numberOfRaycastHits];
-        mMap = GetComponentInChildren<Environment>();
-        mCharacter = Instantiate(character, transform);
-        ShowMenu(true);
+        mMap = GetComponentInChildren<Environment> ();
+        mCharacter = Instantiate (character, transform);
+        TeamsManager.Instance.AddTeam (new Team (new List<Character> () { mCharacter }));
+        ShowMenu (true);
     }
 
-    private void Update()
+    private void Update ()
     {
         // Check to see if the player has clicked a tile and if they have, try to find a path to that 
         // tile. If we find a path then the character will move along it to the clicked tile. 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown (0))
         {
-            Ray screenClick = mainCamera.ScreenPointToRay(Input.mousePosition);
-            int hits = Physics.RaycastNonAlloc(screenClick, mRaycastHits);
+            Ray screenClick = mainCamera.ScreenPointToRay (Input.mousePosition);
+            int hits = Physics.RaycastNonAlloc (screenClick, mRaycastHits);
             if (hits > 0)
             {
-                EnvironmentTile tile = mRaycastHits[0].transform.GetComponent<EnvironmentTile>();
+                EnvironmentTile tile = mRaycastHits[0].transform.GetComponent<EnvironmentTile> ();
                 if (tile != null)
                 {
-                    List<EnvironmentTile> route = mMap.Solve(mCharacter.currentPosition, tile);
-                    mCharacter.GoTo(route);
+                    List<EnvironmentTile> route = mMap.Solve (mCharacter.currentPosition, tile);
+                    mCharacter.GoTo (route);
                 }
             }
         }
     }
 
-    public void ShowMenu(bool show)
+    public void ShowMenu (bool show)
     {
         if (menu != null && hud != null)
         {
@@ -56,7 +57,7 @@ public class Game : MonoBehaviour
             {
                 mCharacter.transform.position = characterStart.position;
                 mCharacter.transform.rotation = characterStart.rotation;
-                mMap.CleanUpWorld();
+                mMap.CleanUpWorld ();
             }
             else
             {
@@ -67,15 +68,15 @@ public class Game : MonoBehaviour
         }
     }
 
-    public void Generate()
+    public void Generate ()
     {
-        mMap.GenerateWorld();
+        mMap.GenerateWorld ();
     }
 
-    public void Exit()
+    public void Exit ()
     {
 #if !UNITY_EDITOR
-            Application.Quit();
+        Application.Quit ();
 #endif
     }
 }
