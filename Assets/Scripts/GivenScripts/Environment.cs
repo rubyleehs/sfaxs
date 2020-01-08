@@ -11,9 +11,8 @@ public class Environment : MonoBehaviour
     [SerializeField] private float AccessiblePercentage;
 
     private EnvironmentTile[][] mMap;
-    private List<EnvironmentTile> mAll;
-    private List<EnvironmentTile> mToBeTested;
-    private List<EnvironmentTile> mLastSolution;
+    private List<EnvironmentTile> mAll; //stores all tiles
+    private List<EnvironmentTile> mLastSolution; //Only used for debugging purposes
 
     private readonly Vector3 NodeSize = Vector3.one * 9.0f;
     private const float TileSize = 10.0f;
@@ -24,7 +23,6 @@ public class Environment : MonoBehaviour
     private void Awake ()
     {
         mAll = new List<EnvironmentTile> ();
-        mToBeTested = new List<EnvironmentTile> ();
     }
 
     private void OnDrawGizmos ()
@@ -166,7 +164,8 @@ public class Environment : MonoBehaviour
     public List<EnvironmentTile> Solve (EnvironmentTile begin, EnvironmentTile destination)
     {
         Debug.Log (begin + " | " + destination);
-        return Pathfinder.Solve (mAll, begin, destination, (a, b) => Distance (a, b), (a, b) => Heuristic (a, b)).Cast<EnvironmentTile> ().ToList ();
+        mLastSolution = Pathfinder.Solve (mAll, begin, destination, (a, b) => Distance (a, b), (a, b) => Heuristic (a, b)).Cast<EnvironmentTile> ().ToList ();
+        return mLastSolution;
     }
 
     private float Distance (IPathfinderNode a, IPathfinderNode b)
