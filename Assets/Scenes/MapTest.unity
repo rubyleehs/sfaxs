@@ -234,34 +234,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b263ebaf27608c94fb273309fd8bf02b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  randomSeed: 30
+  randomSeed: 975433
   gridSizeInCells: {x: 50, y: 50}
   cellResolution: {x: 1, y: 1}
   cellSize: {x: 1, y: 1}
   origin: {x: 0, y: 0, z: 0}
   heightMultiplier: 15
-  frequency: 0.025
-  octaves: 3
-  lacunarity: 2
-  persistence: 0.5
-  coloring:
+  h_frequency: 0.025
+  h_octaves: 3
+  h_lacunarity: 2
+  h_persistence: 0.5
+  t_frequency: 0.035
+  t_octaves: 2
+  t_lacunarity: 2
+  t_persistence: 0.4
+  groundGradient:
     serializedVersion: 2
-    key0: {r: 0, g: 0.24372065, b: 0.49056602, a: 1}
-    key1: {r: 0.24973297, g: 0.5559399, b: 0.8679245, a: 1}
-    key2: {r: 0.8396226, g: 0.7723162, b: 0.11485406, a: 0}
-    key3: {r: 0.25637227, g: 0.8584906, b: 0.23891956, a: 0}
-    key4: {r: 0, g: 0.6415094, b: 0.012258152, a: 0}
-    key5: {r: 0.6792453, g: 0.632705, b: 0.40690637, a: 0}
-    key6: {r: 0.8820755, g: 0.8820755, b: 1, a: 0}
-    key7: {r: 0.8820755, g: 0.8820755, b: 1, a: 0}
+    key0: {r: 0.005644474, g: 0, b: 0.5849056, a: 1}
+    key1: {r: 0.6415094, g: 0.41034347, b: 0.021181926, a: 1}
+    key2: {r: 0.9504907, g: 0.8311468, b: 0.098408766, a: 0}
+    key3: {r: 0.98039216, g: 0.8718697, b: 0.10588233, a: 0}
+    key4: {r: 0, g: 0.8679245, b: 0.09026009, a: 0}
+    key5: {r: 0, g: 0.509434, b: 0.023156067, a: 0}
+    key6: {r: 0.6792453, g: 0.45342368, b: 0.16981132, a: 0}
+    key7: {r: 1, g: 1, b: 1, a: 0}
     ctime0: 3855
-    ctime1: 17155
-    ctime2: 20432
-    ctime3: 23901
-    ctime4: 35466
-    ctime5: 51079
-    ctime6: 62451
-    ctime7: 62451
+    ctime1: 10023
+    ctime2: 19661
+    ctime3: 26021
+    ctime4: 28913
+    ctime5: 47609
+    ctime6: 55898
+    ctime7: 62258
     atime0: 0
     atime1: 65535
     atime2: 0
@@ -271,7 +275,36 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_NumColorKeys: 7
+    m_NumColorKeys: 8
+    m_NumAlphaKeys: 2
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0.005644474, g: 0, b: 0.5849056, a: 1}
+    key1: {r: 0.6415094, g: 0.41034347, b: 0.021181926, a: 1}
+    key2: {r: 0.9504907, g: 0.8311468, b: 0.098408766, a: 0}
+    key3: {r: 0.98039216, g: 0.8718697, b: 0.10588233, a: 0}
+    key4: {r: 0, g: 0.8679245, b: 0.09026009, a: 0}
+    key5: {r: 0, g: 0.509434, b: 0.023156067, a: 0}
+    key6: {r: 0.6792453, g: 0.45342368, b: 0.16981132, a: 0}
+    key7: {r: 1, g: 1, b: 1, a: 0}
+    ctime0: 3855
+    ctime1: 10023
+    ctime2: 19661
+    ctime3: 26021
+    ctime4: 28913
+    ctime5: 47609
+    ctime6: 55898
+    ctime7: 62258
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 8
     m_NumAlphaKeys: 2
   waterLevel: 4.5
   waterMat: {fileID: 2100000, guid: aa75a5d44fdb272498cb6215ab8dc743, type: 2}
