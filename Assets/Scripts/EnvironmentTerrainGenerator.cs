@@ -3,26 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-public class EnviromentTerrainGenerator : MonoBehaviour
+public class EnvironmentTerrainGenerator : MonoBehaviour
 {
     public int randomSeed;
 
-    [Header("Enviroment Grid Physical Attributes")]
+    [Header("Environment Grid Physical Attributes")]
     public Vector2Int gridSizeInCells = Vector2Int.one * 50;
     public Vector2Int cellResolution = Vector2Int.one;
     public Vector2 cellSize = Vector2.one;
     public Vector3 origin = Vector3.zero;
 
 
-    [Header("Enviroment Terrain Proc-Gen Attributes")]
+    [Header("Environment Terrain Proc-Gen Attributes - Height")]
     public float heightMultiplier = 5;
-    public float frequency = 0.2f; //Delta between each perlin noise sampling location
+    public float h_frequency = 0.2f; //Delta between each perlin noise sampling location
     [Range(1, 8)]
-    public int octaves = 1; //Number of perlin noise layers
+    public int h_octaves = 1; //Number of perlin noise layers
     [Range(1f, 4f)]
-    public float lacunarity = 2f; //Multiplier for perlin noise frequency for each noise layer
+    public float h_lacunarity = 2f; //Multiplier for perlin noise frequency for each noise layer
     [Range(0f, 1f)]
-    public float persistence = 0.5f; //Multiplier for how significant each layer should apply to the layer above
+    public float h_persistence = 0.5f; //Multiplier for how significant each layer should apply to the layer above
+
+    [Header("Environment Terrain Proc-Gen Attributes - Temperature")]
+    public float temperatureMultiplier = 5;
+    public float t_frequency = 0.2f; //Delta between each perlin noise sampling location
+    [Range(1, 8)]
+    public int t_octaves = 1; //Number of perlin noise layers
+    [Range(1f, 4f)]
+    public float t_lacunarity = 2f; //Multiplier for perlin noise frequency for each noise layer
+    [Range(0f, 1f)]
+    public float t_persistence = 0.5f; //Multiplier for how significant each layer should apply to the layer above
     public Gradient coloring;
 
     [Header("Water")]
@@ -30,11 +40,11 @@ public class EnviromentTerrainGenerator : MonoBehaviour
     public Material waterMat;
     private Transform waterQuad;
 
-
     [Header("Terrain Mesh Attributes")]
     private Vector2Int gridResolution;
     private Mesh mesh;
-    private float[] heightMap;
+    private float[] meshHeightMap;
+    private float[] meshTemperatureMap;
     private Vector3[] vertices;
     private Vector3[] normals;
     private Color[] colors;
@@ -45,46 +55,51 @@ public class EnviromentTerrainGenerator : MonoBehaviour
     public Vector3 gridProjectorOffset = new Vector3(0, 15, 0);
     private Projector gridProjector;
 
+    [Header("Pathfinding Nodes")]
+    private EnvironmentNode[,] tileMap;
+    private float[,] cellHeightMap;
+
     [Header("Misc")]
     public bool doGenerationAnimation = true;
     public float terrainAnimDuration = 2.5f;
     public float waterAnimDuration = 2.5f;
-    private IEnumerator routine;
 
     private void OnEnable()
     {
         if (mesh == null)
         {
             mesh = new Mesh();
-            mesh.name = "Enviroment Surface Mesh";
+            mesh.name = "Environment Surface Mesh";
             GetComponent<MeshFilter>().mesh = mesh;
         }
-        //Generate(doGenerationAnimation);
+        Generate(doGenerationAnimation);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A)) Generate(doGenerationAnimation);
+        //if (Input.GetKeyDown(KeyCode.A)) Generate(doGenerationAnimation);
     }
 
-    private void Generate(bool animate)
+    public void Generate(bool animate)
     {
+        Random.InitState(randomSeed);
         CreateGridMesh();
         CreateHeightMap();
         CreateWater();
         RefreshGridLines();
         if (animate)
         {
-            StartCoroutine(AnimateTerrainHeight(terrainAnimDuration * 0.8f));
+            StartCoroutine(AnimateTerrainHeight(terrainAnimDuration));
             StartCoroutine(AnimateWaterHeight(waterAnimDuration));
         }
-        else ApplyHeightMap();
+        else ApplyHeightAndTemperatureMap();
+        CreateTileMap(true);
     }
 
     /// <summary>
-    /// Creates the terrain mesh using perlin noise
+    /// Creates the Grid mesh.
     /// </summary>
-    public void CreateGridMesh()
+    private void CreateGridMesh()
     {
         mesh.Clear();
         gridResolution = gridSizeInCells * cellResolution;
@@ -125,28 +140,50 @@ public class EnviromentTerrainGenerator : MonoBehaviour
         mesh.RecalculateNormals();
     }
 
-    public void CreateHeightMap()
+    /// <summary>
+    /// Creates the temperature map using perlin noise.
+    /// </summary>
+    private void CreateTemperatureMap()
     {
-        Random.InitState(randomSeed);
         Vector2 perlinOffset = new Vector2(Random.value, Random.value) * 1000;
-        heightMap = new float[vertices.Length];
+        meshTemperatureMap = new float[vertices.Length];
         for (int v = 0, y = 0; y <= gridResolution.y; y++)
         {
             for (int x = 0; x <= gridResolution.x; x++, v++)
             {
-                heightMap[v] = GetAdaptedPerlinNoiseValue(new Vector2(x, y) + perlinOffset, frequency, octaves, lacunarity, persistence);
+                meshTemperatureMap[v] = GetAdaptedPerlinNoiseValue(new Vector2(x, y) + perlinOffset, t_frequency, t_octaves, t_lacunarity, t_persistence);
             }
         }
     }
 
-    public void ApplyHeightMap()
+
+    /// <summary>
+    /// Creates the height map using perlin noise.
+    /// </summary>
+    private void CreateHeightMap()
+    {
+        Vector2 perlinOffset = new Vector2(Random.value, Random.value) * 1000;
+        meshHeightMap = new float[vertices.Length];
+        for (int v = 0, y = 0; y <= gridResolution.y; y++)
+        {
+            for (int x = 0; x <= gridResolution.x; x++, v++)
+            {
+                meshHeightMap[v] = GetAdaptedPerlinNoiseValue(new Vector2(x, y) + perlinOffset, h_frequency, h_octaves, h_lacunarity, h_persistence);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Applies the height and temperature map onto the mesh and updates the mesh.
+    /// </summary>
+    private void ApplyHeightAndTemperatureMap()
     {
         for (int v = 0, y = 0; y <= gridResolution.y; y++)
         {
             for (int x = 0; x <= gridResolution.x; x++, v++)
             {
-                vertices[v].y = heightMap[v] * heightMultiplier;
-                colors[v] = coloring.Evaluate(heightMap[v]);
+                vertices[v].y = meshHeightMap[v] * heightMultiplier;
+                colors[v] = coloring.Evaluate(meshHeightMap[v]);
             }
         }
         mesh.vertices = vertices;
@@ -154,10 +191,14 @@ public class EnviromentTerrainGenerator : MonoBehaviour
         mesh.RecalculateNormals();
     }
 
-    public IEnumerator AnimateTerrainHeight(float duration)
+    /// <summary>
+    /// Animates the height map being applies to the mesh.
+    /// </summary>
+    /// <param name="duration">Duration of the animation. </param>
+    private IEnumerator AnimateTerrainHeight(float duration)
     {
         if (mesh == null) yield break;
-        if (heightMap == null) yield break;
+        if (meshHeightMap == null) yield break;
 
         float smoothProgress = 0, time = Time.time;
         while (smoothProgress < 1)
@@ -168,7 +209,7 @@ public class EnviromentTerrainGenerator : MonoBehaviour
             {
                 for (int x = 0; x <= gridResolution.x; x++, v++)
                 {
-                    val = Mathf.Lerp(0, heightMap[v], smoothProgress);
+                    val = Mathf.Lerp(0, meshHeightMap[v], smoothProgress);
                     vertices[v].y = val * heightMultiplier;
                     colors[v] = coloring.Evaluate(val);
                 }
@@ -182,7 +223,10 @@ public class EnviromentTerrainGenerator : MonoBehaviour
         ApplyHeightMap();//Just in case
     }
 
-    public void CreateWater()
+    /// <summary>
+    /// Creates the water quad and positions it at waterLevel.
+    /// </summary>
+    private void CreateWater()
     {
         if (waterQuad == null)
         {
@@ -197,7 +241,11 @@ public class EnviromentTerrainGenerator : MonoBehaviour
         waterQuad.localScale = (Vector3)(gridSizeInCells * cellSize) + Vector3.forward;
     }
 
-    public IEnumerator AnimateWaterHeight(float duration)
+    /// <summary>
+    /// Moves the water quad position to y = 0 and animates it rising to water level.
+    /// </summary>
+    /// <param name="duration">Duration of the animation. </param>
+    private IEnumerator AnimateWaterHeight(float duration)
     {
         float smoothProgress = 0, time = Time.time;
         while (smoothProgress < 1)
@@ -207,6 +255,7 @@ public class EnviromentTerrainGenerator : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
     }
+
     /// <summary>
     /// Refreshes the grid lines that is projected onto the terrain mesh
     /// </summary>
@@ -231,7 +280,7 @@ public class EnviromentTerrainGenerator : MonoBehaviour
     /// <param name="lacunarity">Multiplier for perlin noise frequency for each noise layer. </param>
     /// <param name="persistence">Multiplier for how significant each layer should apply to the layer above. </param>
     /// <returns>Perlin noise float value</returns>
-    public float GetAdaptedPerlinNoiseValue(Vector2 position, float frequency, int octaves, float lacunarity, float persistence)
+    private float GetAdaptedPerlinNoiseValue(Vector2 position, float frequency, int octaves, float lacunarity, float persistence)
     {
         float sum = Mathf.PerlinNoise(position.x * frequency, position.y * frequency);
         float amplitude = 1f;
@@ -244,5 +293,82 @@ public class EnviromentTerrainGenerator : MonoBehaviour
             sum += Mathf.PerlinNoise(position.x * frequency, position.y * frequency) * amplitude;
         }
         return sum / range;
+    }
+
+    private void CreateTileMap(bool connectDiagonals)
+    {
+        tileMap = new EnvironmentNode[gridSizeInCells.x, gridSizeInCells.y];
+        CreateTileHeightMapFromTerrain();
+
+        EnvironmentNode temp;
+        for (int y = 0; y < gridSizeInCells.y; y++)
+        {
+            for (int x = 0; x < gridSizeInCells.x; x++)
+            {
+                tileMap[x, y] = new EnvironmentNode(new Vector3(x * cellSize.x, cellHeightMap[x, y], y * cellSize.y));//Set terrain type here too?
+                temp = tileMap[x, y];
+                if (x > 0)
+                {
+                    temp.connections.Add(tileMap[x - 1, y]);
+                    tileMap[x - 1, y].connections.Add(temp);
+                }
+                if (y > 0)
+                {
+                    temp.connections.Add(tileMap[x, y - 1]);
+                    tileMap[x, y - 1].connections.Add(temp);
+                }
+                if (connectDiagonals)
+                {
+                    if (y > 0)
+                    {
+                        if (x < gridSizeInCells.x - 1)
+                        {
+                            temp.connections.Add(tileMap[x + 1, y - 1]);
+                            tileMap[x + 1, y - 1].connections.Add(temp);
+                        }
+                        if (x > 0)
+                        {
+                            temp.connections.Add(tileMap[x - 1, y - 1]);
+                            tileMap[x - 1, y - 1].connections.Add(temp);
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates tileHeightMap which stores the height of the center of each tile. Currently is an approximate which gets worse the higher the cell resolution is.
+    /// </summary>
+    private void CreateTileHeightMapFromTerrain()
+    {
+        cellHeightMap = new float[gridSizeInCells.x, gridSizeInCells.y];
+        Vector2Int size = gridResolution + Vector2Int.one;
+        for (int y = 0; y < gridSizeInCells.y; y++)
+        {
+            for (int x = 0; x < gridSizeInCells.x; x++)
+            {
+                //Debug.DrawLine(vertices[y * size.x * cellResolution.y + x * cellResolution.x], vertices[(y + 1) * size.x * cellResolution.y + (x + 1) * cellResolution.x], Color.red, 100);
+                cellHeightMap[x, y] = (meshHeightMap[y * size.x * cellResolution.y + x * cellResolution.x] + meshHeightMap[(y + 1) * size.x * cellResolution.y + (x + 1) * cellResolution.x]) * 0.5f * heightMultiplier;
+            }
+        }
+    }
+
+
+    private void OnDrawGizmos()
+    {
+        if (tileMap != null)
+        {
+            for (int y = 0; y < gridSizeInCells.y; y++)
+            {
+                for (int x = 0; x < gridSizeInCells.x; x++)
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawSphere(tileMap[x, y].position, 0.1f);
+
+                }
+            }
+        }
     }
 }

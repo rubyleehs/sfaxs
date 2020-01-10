@@ -236,7 +236,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   randomSeed: 30
   gridSizeInCells: {x: 50, y: 50}
-  cellResolution: {x: 2, y: 2}
+  cellResolution: {x: 1, y: 1}
   cellSize: {x: 1, y: 1}
   origin: {x: 0, y: 0, z: 0}
   heightMultiplier: 15
@@ -279,8 +279,8 @@ MonoBehaviour:
   gridLinesProjectorPrefab: {fileID: 7453671600227009203, guid: 8a4a041b13dd0b24992ad4fd74862b68,
     type: 3}
   gridProjectorOffset: {x: 0, y: 15, z: 0}
-  doGenerationAnimation: 1
-  terrainAnimDuration: 2.1
+  doGenerationAnimation: 0
+  terrainAnimDuration: 1.8
   waterAnimDuration: 2.7
 --- !u!23 &1345968554
 MeshRenderer:
