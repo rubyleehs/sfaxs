@@ -196,13 +196,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 51692298}
-  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-  m_LocalPosition: {x: 25, y: 40, z: -0.8}
+  m_LocalRotation: {x: 0.37217793, y: 0, z: 0, w: 0.92816144}
+  m_LocalPosition: {x: 185.1, y: 189.06, z: -46.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 43.7, y: 0, z: 0}
 --- !u!1 &1345968552
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,20 +234,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b263ebaf27608c94fb273309fd8bf02b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  randomSeed: 975433
+  randomSeed: 421874
   gridSizeInCells: {x: 50, y: 50}
   cellResolution: {x: 1, y: 1}
-  cellSize: {x: 1, y: 1}
-  origin: {x: 0, y: 0, z: 0}
-  heightMultiplier: 15
+  cellSize: {x: 7, y: 7}
+  origin: {x: 0, y: -31.5, z: 0}
+  heightMultiplier: 105
   h_frequency: 0.025
   h_octaves: 3
   h_lacunarity: 2
-  h_persistence: 0.5
+  h_persistence: 0.522
   t_frequency: 0.035
   t_octaves: 2
   t_lacunarity: 2
   t_persistence: 0.4
+  gradientHeightWeightage: 0.7
+  gradientTemperatureWeightage: 0.3
   groundGradient:
     serializedVersion: 2
     key0: {r: 0.005644474, g: 0, b: 0.5849056, a: 1}
@@ -277,44 +279,38 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 8
     m_NumAlphaKeys: 2
-  gradient:
-    serializedVersion: 2
-    key0: {r: 0.005644474, g: 0, b: 0.5849056, a: 1}
-    key1: {r: 0.6415094, g: 0.41034347, b: 0.021181926, a: 1}
-    key2: {r: 0.9504907, g: 0.8311468, b: 0.098408766, a: 0}
-    key3: {r: 0.98039216, g: 0.8718697, b: 0.10588233, a: 0}
-    key4: {r: 0, g: 0.8679245, b: 0.09026009, a: 0}
-    key5: {r: 0, g: 0.509434, b: 0.023156067, a: 0}
-    key6: {r: 0.6792453, g: 0.45342368, b: 0.16981132, a: 0}
-    key7: {r: 1, g: 1, b: 1, a: 0}
-    ctime0: 3855
-    ctime1: 10023
-    ctime2: 19661
-    ctime3: 26021
-    ctime4: 28913
-    ctime5: 47609
-    ctime6: 55898
-    ctime7: 62258
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_NumColorKeys: 8
-    m_NumAlphaKeys: 2
-  waterLevel: 4.5
+  rocksPrefabs:
+  - {fileID: 42463213575937282, guid: 9ed784d40e2efd04b85c60aca0fbd551, type: 3}
+  - {fileID: 9137499876811493004, guid: 70ca7abc7bde8af459fe147d501c31d8, type: 3}
+  - {fileID: 4753748652896598062, guid: 5ca521e5cb0c2394fb6a178618adf02e, type: 3}
+  - {fileID: 4289564314473184796, guid: 599b5aea6e05c104084f0434d78bb7a6, type: 3}
+  - {fileID: 6849790453699707163, guid: 6700dcd024e69494a99fe9a10c5d8ff1, type: 3}
+  - {fileID: 4547780164609786174, guid: dcca91eb708276940a012f48d004d921, type: 3}
+  - {fileID: 7158864703595891082, guid: fe4a537deff4c7a45bf224bb70e0c613, type: 3}
+  treesPrefabs:
+  - {fileID: 1383434216730589323, guid: 6ceb6e2297dc5204dbcf7f902cf17eb4, type: 3}
+  - {fileID: 4671600912073795833, guid: 240a8aef0ed073e48816b032651e8f86, type: 3}
+  palmTreesPrefabs:
+  - {fileID: 5048846475203820137, guid: 490a1c60a2476d04ca5478343b228529, type: 3}
+  - {fileID: 2384375895567129624, guid: 50f6a8b5053e1d14c85a95b07dfb82c0, type: 3}
+  numOfRocks: {x: 2, y: 8}
+  initialTreeSeedingsCount: {x: 2, y: 5}
+  treeGrowthGenerations: {x: 3, y: 8}
+  treeReproductionChance: 0.08
+  treeDeathChance: 0.2
+  waterLevel: 0.3
   waterMat: {fileID: 2100000, guid: aa75a5d44fdb272498cb6215ab8dc743, type: 2}
+  snowLineLevel: 1
+  coastLineLevel: 0.37
   showGridLines: 1
   gridLinesProjectorPrefab: {fileID: 7453671600227009203, guid: 8a4a041b13dd0b24992ad4fd74862b68,
     type: 3}
-  gridProjectorOffset: {x: 0, y: 15, z: 0}
-  doGenerationAnimation: 0
-  terrainAnimDuration: 1.8
-  waterAnimDuration: 2.7
+  gridProjectorOffset: {x: 0, y: 25, z: 0}
+  allowDiagonalMovement: 1
+  doGenerationAnimation: 1
+  terrainAnimDuration: 1.62
+  waterAnimDuration: 2.43
+  propAnimDuration: 3.24
 --- !u!23 &1345968554
 MeshRenderer:
   m_ObjectHideFlags: 0

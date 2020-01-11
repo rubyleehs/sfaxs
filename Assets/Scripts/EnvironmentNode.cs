@@ -4,10 +4,11 @@ using UnityEngine;
 
 public enum TerrainType
 {
-    Land,
     Water,
-    Narrow,
-    Destuctible //Add as necessary    
+    Hill,
+    Mountain,
+    Trees,
+    Boulder //Add as necessary    
 }
 
 public class EnvironmentNode : IPathfinderNode
@@ -20,11 +21,14 @@ public class EnvironmentNode : IPathfinderNode
     public float local { get; set; } // stores distance traveled in A*
     public bool visited { get; set; } //Visited by A*
 
+    public HashSet<TerrainType> terrain;
+
     public EnvironmentNode(Vector3 position, bool isAccessible = true)
     {
         this.position = position;
         this.isAccessible = isAccessible;
         connections = new List<IPathfinderNode>();
+        terrain = new HashSet<TerrainType>();
     }
 
     public void ResetCalStats()
