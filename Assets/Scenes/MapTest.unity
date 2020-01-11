@@ -196,13 +196,82 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 51692298}
-  m_LocalRotation: {x: 0.37217793, y: 0, z: 0, w: 0.92816144}
-  m_LocalPosition: {x: 185.1, y: 189.06, z: -46.8}
+  m_LocalRotation: {x: 0.25340444, y: 0.66014105, z: -0.25340444, w: 0.66014105}
+  m_LocalPosition: {x: -26, y: 155, z: 172}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 43.7, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 42, y: 90, z: 0}
+--- !u!1001 &1244140552
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8878479743007053531, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_Name
+      value: CrossProjector
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 194
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -16
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 138
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878479743006558971, guid: 69ed2c7995bf09946a2ae669af77da48,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 69ed2c7995bf09946a2ae669af77da48, type: 3}
 --- !u!1 &1345968552
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,7 +303,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b263ebaf27608c94fb273309fd8bf02b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  randomSeed: 421874
+  randomSeed: 6
   gridSizeInCells: {x: 50, y: 50}
   cellResolution: {x: 1, y: 1}
   cellSize: {x: 7, y: 7}
@@ -263,8 +332,8 @@ MonoBehaviour:
     ctime0: 3855
     ctime1: 10023
     ctime2: 19661
-    ctime3: 26021
-    ctime4: 28913
+    ctime3: 26600
+    ctime4: 31611
     ctime5: 47609
     ctime6: 55898
     ctime7: 62258
@@ -301,13 +370,13 @@ MonoBehaviour:
   waterLevel: 0.3
   waterMat: {fileID: 2100000, guid: aa75a5d44fdb272498cb6215ab8dc743, type: 2}
   snowLineLevel: 1
-  coastLineLevel: 0.37
+  coastLineLevel: 0.375
   showGridLines: 1
   gridLinesProjectorPrefab: {fileID: 7453671600227009203, guid: 8a4a041b13dd0b24992ad4fd74862b68,
     type: 3}
   gridProjectorOffset: {x: 0, y: 25, z: 0}
   allowDiagonalMovement: 1
-  doGenerationAnimation: 1
+  doGenerationAnimation: 0
   terrainAnimDuration: 1.62
   waterAnimDuration: 2.43
   propAnimDuration: 3.24

@@ -111,12 +111,12 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
             propParent = new GameObject("Prop Parent").transform;
             propParent.SetParent(transform);
         }
-        //Generate(doGenerationAnimation);
+        Generate(doGenerationAnimation);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A)) Generate(doGenerationAnimation);
+        //if (Input.GetKeyDown(KeyCode.A)) Generate(doGenerationAnimation);
     }
 
     public void Generate(bool animate)
@@ -142,8 +142,6 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
             StartCoroutine(AnimatePropPlacement(propAnimDuration));
         }
         else ApplyHeightAndTemperatureMap();
-
-
     }
 
     /// <summary>
@@ -195,7 +193,7 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     /// </summary>
     private void CreateTemperatureMap()
     {
-        Vector2 perlinOffset = new Vector2(Random.value, Random.value) * 1000;
+        Vector2 perlinOffset = new Vector2(Random.value, Random.value) * 10000;
         temperatureMap = new float[vertices.Length];
         for (int v = 0, y = 0; y <= gridResolution.y; y++)
         {
@@ -211,7 +209,7 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     /// </summary>
     private void CreateHeightMap()
     {
-        Vector2 perlinOffset = new Vector2(Random.value, Random.value) * 1000;
+        Vector2 perlinOffset = new Vector2(Random.value, Random.value) * 10000;
         heightMap = new float[vertices.Length];
         for (int v = 0, y = 0; y <= gridResolution.y; y++)
         {
@@ -306,13 +304,17 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Teleports prop parent down and lerps it back up. 
+    /// </summary>
+    /// <param name="duration">duration of the animation. </param>
     private IEnumerator AnimatePropPlacement(float duration)
     {
         float smoothProgress = 0, time = Time.time;
         while (smoothProgress < 1)
         {
             smoothProgress = Mathf.SmoothStep(0, 1, (Time.time - time) / duration);
-            propParent.localPosition = Vector3.down * Mathf.Lerp(75, 0, smoothProgress);
+            propParent.localPosition = Vector3.down * Mathf.Lerp(75, 0, smoothProgress);//Magic Number!
             yield return new WaitForEndOfFrame();
         }
     }
@@ -356,6 +358,10 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         return sum / range;
     }
 
+    /// <summary>
+    /// Creates a 2d "tile" map of EnviromentNodes and connects them.
+    /// </summary>
+    /// <param name="connectDiagonals">Should the cells be connected diagonally too? </param>
     private void CreateTileMap(bool connectDiagonals)
     {
         nodeMap = new EnvironmentNode[gridSizeInCells.x, gridSizeInCells.y];
@@ -402,8 +408,8 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     /// <summary>
     /// Approximate the Y position of the center the cell at coordinate (x,y). Currently is an approximate which gets worse the higher the cell resolution is.
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
+    /// <param name="x">X index of cell. </param>
+    /// <param name="y">Y index of cell. </param>
     /// <returns></returns>
     private float ApproxCellYPosition(int x, int y)
     {
@@ -411,11 +417,19 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         return (heightMap[y * size.x * cellResolution.y + x * cellResolution.x] + heightMap[(y + 1) * size.x * cellResolution.y + (x + 1) * cellResolution.x]) * 0.5f * heightMultiplier;
     }
 
+    /// <summary>
+    /// Evaluates what color the a vertex color should be based on the heightMap, temperatureMap and its weightages
+    /// </summary>
+    /// <param name="vertex">vertex index. </param>
+    /// <returns>A color</returns>
     private Color EvaluateGroundColor(int vertex)
     {
         return groundGradient.Evaluate(heightMap[vertex] * gradientHeightWeightage + temperatureMap[vertex] * gradientTemperatureWeightage);
     }
 
+    /// <summary>
+    /// Generates and Place Rocks
+    /// </summary>
     private void GenerateRocks()
     {
         int n = Random.Range(numOfRocks.x, numOfRocks.y + 1);
@@ -428,11 +442,19 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Checks if the particular node at nodeIndex allow placement of rocks
+    /// </summary>
+    /// <param name="nodeIndex">Index of node to check. </param>
     private bool CanPlaceRock(Vector2Int nodeIndex)
     {
         return !(nodeMap[nodeIndex.x, nodeIndex.y].terrain.Contains(TerrainType.Boulder) || nodeMap[nodeIndex.x, nodeIndex.y].terrain.Contains(TerrainType.Trees));
     }
 
+    /// <summary>
+    /// Creates and positions the rock at nodeIndex and updates the status of the node.
+    /// </summary>
+    /// <param name="nodeIndex">Node Index of the node</param>
     private void PlaceRock(Vector2Int nodeIndex)
     {
         EnvironmentNode n = nodeMap[nodeIndex.x, nodeIndex.y];
@@ -440,6 +462,10 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         n.terrain.Add(TerrainType.Boulder);
         propsTransforms.Add(Instantiate(rocksPrefabs[Random.Range(0, rocksPrefabs.Length)], n.position, Quaternion.Euler(Vector3.up * Random.value * 360), propParent).transform);
     }
+
+    /// <summary>
+    /// Generate and Place Trees
+    /// </summary>
     private void GenerateTrees()
     {
         int numOfInitialSeeding = Random.Range(initialTreeSeedingsCount.x, initialTreeSeedingsCount.y + 1);
@@ -504,6 +530,11 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Creates and positins the tree at nodeIndex and updates the status of the node.
+    /// </summary>
+    /// <param name="nodeIndex">Node Index of the node</param>
+    /// <param name="isBig">if the tree should be fully grown</param>
     private void GrowTree(Vector2Int nodeIndex, bool isBig)
     {
         EnvironmentNode n = nodeMap[nodeIndex.x, nodeIndex.y];
@@ -513,6 +544,12 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         else propsTransforms.Add(Instantiate(isBig ? treesPrefabs[1] : treesPrefabs[0], n.position, Quaternion.Euler(Vector3.up * Random.value * 360), propParent).transform);
     }
 
+    /// <summary>
+    /// Checks the node allows the growth of trees.
+    /// </summary>
+    /// <param name="nodeIndex">Node Index of the node. </param>
+    /// <param name="fromIndex">Where the tree is spreading from. </param>
+    /// <returns></returns>
     private bool CanGrowTrees(Vector2Int nodeIndex, Vector2Int? fromIndex = null)
     {
         if (fromIndex == null) return CanGrowTrees(nodeMap[nodeIndex.x, nodeIndex.y]);
@@ -533,6 +570,10 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         return !(index.x < 0 || index.y < 0 || index.x >= nodeMap.GetLength(0) || index.y >= nodeMap.GetLength(1));
     }
 
+    /// <summary>
+    /// Checks if a node fullfill conditions to be a TerrainType and add it
+    /// </summary>
+    /// <param name="node">Node to check. </param>
     private void DetectAndAddTerrainTypes(ref EnvironmentNode node)
     {
         if (node.position.y <= trueWaterLevel)
