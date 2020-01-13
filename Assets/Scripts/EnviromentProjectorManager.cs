@@ -27,7 +27,7 @@ public class EnviromentProjectorManager : ProjectorTextureCreator
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A)) RefreshGridLinesProjection();
+        //if (Input.GetKeyDown(KeyCode.A)) RefreshGridLinesProjection();
     }
 
     /// <summary>
@@ -56,6 +56,6 @@ public class EnviromentProjectorManager : ProjectorTextureCreator
         Vector3 temp = EnvironmentTerrainGenerator.nodeMap[center.x, center.y].position;
         moveRangeProjector.transform.position = new Vector3(temp.x, projectorsHeight, temp.z);
         moveRangeProjector.orthographicSize = (map.GetLength(1) + 2) * 0.5f * EnvironmentTerrainGenerator.trueCellSize.y;
-        moveRangeProjector.aspectRatio = EnvironmentTerrainGenerator.trueCellSize.x / EnvironmentTerrainGenerator.trueCellSize.y;
+        moveRangeProjector.aspectRatio = ((map.GetLength(0) + 2) * EnvironmentTerrainGenerator.trueCellSize.x) / ((map.GetLength(1) + 2) * EnvironmentTerrainGenerator.trueCellSize.y);
     }
 }

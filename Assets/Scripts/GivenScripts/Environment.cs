@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class Environment : MonoBehaviour
 {
-    [SerializeField] private List<EnvironmentTile> AccessibleTiles; //these are tils to be used when generating
-    [SerializeField] private List<EnvironmentTile> InaccessibleTiles;
+    [SerializeField] private List<GameObject> AccessibleTiles; //these are tils to be used when generating
+    [SerializeField] private List<GameObject> InaccessibleTiles;
     [SerializeField] private Vector2Int Size;
     [SerializeField] private float AccessiblePercentage;
 
@@ -20,12 +20,12 @@ public class Environment : MonoBehaviour
 
     public EnvironmentTile Start { get; private set; }
 
-    private void Awake ()
+    private void Awake()
     {
-        mAll = new List<EnvironmentTile> ();
+        mAll = new List<EnvironmentTile>();
     }
 
-    private void OnDrawGizmos ()
+    private void OnDrawGizmos()
     {
         // Draw the environment nodes and connections if we have them
         if (mMap != null)
@@ -39,7 +39,7 @@ public class Environment : MonoBehaviour
                         for (int n = 0; n < mMap[x][y].connections.Count; ++n)
                         {
                             Gizmos.color = Color.blue;
-                            Gizmos.DrawLine (mMap[x][y].position, mMap[x][y].connections[n].position);
+                            Gizmos.DrawLine(mMap[x][y].position, mMap[x][y].connections[n].position);
                         }
                     }
 
@@ -51,7 +51,7 @@ public class Environment : MonoBehaviour
                     }
                     else
                     {
-                        if (mLastSolution != null && mLastSolution.Contains (mMap[x][y]))
+                        if (mLastSolution != null && mLastSolution.Contains(mMap[x][y]))
                         {
                             c = Color.green;
                         }
@@ -62,13 +62,13 @@ public class Environment : MonoBehaviour
                     }
 
                     Gizmos.color = c;
-                    Gizmos.DrawWireCube (mMap[x][y].position, NodeSize);
+                    Gizmos.DrawWireCube(mMap[x][y].position, NodeSize);
                 }
             }
         }
     }
 
-    private void Generate ()
+    private void Generate()
     {
         // Setup the map of the environment tiles according to the specified width and height
         // Generate tiles from the list of accessible and inaccessible prefabs using a random
@@ -77,7 +77,7 @@ public class Environment : MonoBehaviour
 
         int halfWidth = Size.x / 2;
         int halfHeight = Size.y / 2;
-        Vector3 position = new Vector3 (-(halfWidth * TileSize), 0.0f, -(halfHeight * TileSize));
+        Vector3 position = new Vector3(-(halfWidth * TileSize), 0.0f, -(halfHeight * TileSize));
         bool start = true;
 
         for (int x = 0; x < Size.x; ++x)
@@ -86,14 +86,14 @@ public class Environment : MonoBehaviour
             for (int y = 0; y < Size.y; ++y)
             {
                 bool isAccessible = start || Random.value < AccessiblePercentage;
-                List<EnvironmentTile> tiles = isAccessible ? AccessibleTiles : InaccessibleTiles;
-                EnvironmentTile prefab = tiles[Random.Range (0, tiles.Count)];
-                EnvironmentTile tile = Instantiate (prefab, position, Quaternion.identity, transform);
-                tile.position = new Vector3 (position.x + (TileSize / 2), TileHeight, position.z + (TileSize / 2));
+                List<GameObject> tiles = isAccessible ? AccessibleTiles : InaccessibleTiles;
+                GameObject prefab = tiles[Random.Range(0, tiles.Count)];
+                EnvironmentTile tile = Instantiate(prefab, position, Quaternion.identity, transform).GetComponent<EnvironmentTile>();
+                tile.position = new Vector3(position.x + (TileSize / 2), TileHeight, position.z + (TileSize / 2));
                 tile.isAccessible = isAccessible;
-                tile.gameObject.name = string.Format ("Tile({0},{1})", x, y);
+                tile.gameObject.name = string.Format("Tile({0},{1})", x, y);
                 mMap[x][y] = tile;
-                mAll.Add (tile);
+                mAll.Add(tile);
 
                 if (start)
                 {
@@ -109,7 +109,7 @@ public class Environment : MonoBehaviour
         }
     }
 
-    private void SetupConnections ()
+    private void SetupConnections()
     {
         // Currently we are only setting up connections between adjacnt nodes
         for (int x = 0; x < Size.x; ++x)
@@ -117,37 +117,37 @@ public class Environment : MonoBehaviour
             for (int y = 0; y < Size.y; ++y)
             {
                 EnvironmentTile tile = mMap[x][y];
-                tile.connections = new List<IPathfinderNode> ();
+                tile.connections = new List<IPathfinderNode>();
                 if (x > 0)
                 {
-                    tile.connections.Add (mMap[x - 1][y]);
+                    tile.connections.Add(mMap[x - 1][y]);
                 }
 
                 if (x < Size.x - 1)
                 {
-                    tile.connections.Add (mMap[x + 1][y]);
+                    tile.connections.Add(mMap[x + 1][y]);
                 }
 
                 if (y > 0)
                 {
-                    tile.connections.Add (mMap[x][y - 1]);
+                    tile.connections.Add(mMap[x][y - 1]);
                 }
 
                 if (y < Size.y - 1)
                 {
-                    tile.connections.Add (mMap[x][y + 1]);
+                    tile.connections.Add(mMap[x][y + 1]);
                 }
             }
         }
     }
 
-    public void GenerateWorld ()
+    public void GenerateWorld()
     {
-        Generate ();
-        SetupConnections ();
+        Generate();
+        SetupConnections();
     }
 
-    public void CleanUpWorld ()
+    public void CleanUpWorld()
     {
         if (mMap != null)
         {
@@ -155,25 +155,25 @@ public class Environment : MonoBehaviour
             {
                 for (int y = 0; y < Size.y; ++y)
                 {
-                    Destroy (mMap[x][y].gameObject);
+                    Destroy(mMap[x][y].gameObject);
                 }
             }
         }
     }
 
-    public List<EnvironmentTile> Solve (EnvironmentTile begin, EnvironmentTile destination)
+    public List<EnvironmentTile> Solve(EnvironmentTile begin, EnvironmentTile destination)
     {
-        Debug.Log (begin + " | " + destination);
-        mLastSolution = Pathfinder.Solve (mAll, begin, destination, (a, b) => Distance (a, b), (a, b) => Heuristic (a, b)).Cast<EnvironmentTile> ().ToList ();
+        Debug.Log(begin + " | " + destination);
+        mLastSolution = Pathfinder.Solve(mAll, begin, destination, (a, b) => Distance(a, b), (a, b) => Heuristic(a, b));
         return mLastSolution;
     }
 
-    private float Distance (IPathfinderNode a, IPathfinderNode b)
+    private float Distance(IPathfinderNode a, IPathfinderNode b)
     {
         // Use the length of the connection between these two nodes to find the distance, this 
         // is used to calculate the local goal during the search for a path to a location
         float result = float.MaxValue;
-        IPathfinderNode directConnection = a.connections.Find (c => c == b);
+        IPathfinderNode directConnection = a.connections.Find(c => c == b);
         if (directConnection != null)
         {
             result = TileSize;
@@ -181,12 +181,12 @@ public class Environment : MonoBehaviour
         return result;
     }
 
-    private float Heuristic (IPathfinderNode a, IPathfinderNode b)
+    private float Heuristic(IPathfinderNode a, IPathfinderNode b)
     {
         // Use the locations of the node to estimate how close they are by line of sight
         // experiment here with better ways of estimating the distance. This is used  to
         // calculate the global goal and work out the best order to prossess nodes in
-        return Vector3.Distance (a.position, b.position);
+        return Vector3.Distance(a.position, b.position);
     }
 
 }

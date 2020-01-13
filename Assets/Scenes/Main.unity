@@ -1279,24 +1279,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AccessibleTiles:
-  - {fileID: 5225831561217036612, guid: 068b00b1b45e14e49a33d5ab4dc954a2, type: 3}
+  - {fileID: 3030514941319876423, guid: 068b00b1b45e14e49a33d5ab4dc954a2, type: 3}
   InaccessibleTiles:
-  - {fileID: 7228575818001999334, guid: d85ca6f08a4ef8848b08ae4126b05734, type: 3}
-  - {fileID: 4499036324842488966, guid: cd048cafd4c60d14d81bdb56cdb167ef, type: 3}
-  - {fileID: 571534609703175618, guid: a99f7d9f1e95e294c83d0acf2b5bf7f4, type: 3}
-  - {fileID: 4665734947335233729, guid: 84d83d076aecd1044aa0cdd7f246274b, type: 3}
-  - {fileID: 7603024997213197666, guid: 85c72f2e63f7ff349b2aa0cc58203b3d, type: 3}
-  - {fileID: 6878312587856686978, guid: 2e24aaa96e0e79a46a25f9d3b9aa0679, type: 3}
-  - {fileID: 8522373763716547169, guid: 8f9604e6cd0daa340bd2ea2bd9e2f757, type: 3}
-  - {fileID: 6828311611057938483, guid: 2593f9f48587c074b832d6b770276a89, type: 3}
-  - {fileID: 7154152902380780791, guid: c5e37a9ed6d6fa647b00d6e82ee5c16b, type: 3}
-  - {fileID: 6327076274816214487, guid: 5c03a0599a791424e81d737a11c51460, type: 3}
-  - {fileID: 4443834457755422267, guid: c92f341529f498949a8bb6b831a12b68, type: 3}
-  - {fileID: 4813118846058157084, guid: 24e8e3333cc7b864c9339faac3d44219, type: 3}
-  - {fileID: 945550802858055119, guid: 27727d922a27a4b47afa81ac009daa90, type: 3}
-  - {fileID: 10103160160458647, guid: aa373cc3cd8cfa7418126bd0b9a47880, type: 3}
-  - {fileID: 8392035395846825301, guid: 4c0f70225ccee9c4eb8b566b0124f754, type: 3}
-  - {fileID: 428312736237616533, guid: b2937a6c300c0624a8fb7c65bf8b21b3, type: 3}
+  - {fileID: 7566432309934268640, guid: d85ca6f08a4ef8848b08ae4126b05734, type: 3}
   Size: {x: 20, y: 15}
   AccessiblePercentage: 0.85
 --- !u!4 &2083344931

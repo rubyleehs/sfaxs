@@ -86,6 +86,7 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     [Header("Pathfinding Nodes")]
     public bool allowDiagonalMovement;
     public static EnvironmentNode[,] nodeMap;
+    public static List<EnvironmentNode> allNodes = new List<EnvironmentNode>(); //See Pathfinder.cs to remove this smell
 
     [Header("Misc")]
     public float terrainAnimDuration = 2.5f;
@@ -339,13 +340,15 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     private void CreateTileMap(bool connectDiagonals)
     {
         nodeMap = new EnvironmentNode[gridSizeInCells.x, gridSizeInCells.y];
-
+        float cellYPos;
         EnvironmentNode temp;
         for (int y = 0; y < gridSizeInCells.y; y++)
         {
             for (int x = 0; x < gridSizeInCells.x; x++)
             {
-                nodeMap[x, y] = new EnvironmentNode(origin + new Vector3(x * trueCellSize.x, ApproxCellYPosition(x, y), y * trueCellSize.y), new Vector2Int(x, y));//Set terrain type here too?
+                cellYPos = ApproxCellYPosition(x, y);
+                nodeMap[x, y] = new EnvironmentNode(origin + new Vector3(x * trueCellSize.x, cellYPos, y * trueCellSize.y), new Vector2Int(x, y), cellYPos / heightMultiplier);//Set terrain type here too?
+                allNodes.Add(nodeMap[x, y]);
                 DetectAndAddTerrainTypes(ref nodeMap[x, y]);
                 temp = nodeMap[x, y];
                 if (x > 0)
@@ -514,7 +517,6 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     {
         EnvironmentNode n = nodeMap[nodeIndex.x, nodeIndex.y];
         n.terrain.Add(TerrainType.Trees);
-        n.isAccessible = false;
         if (n.position.y < trueCoastLineLevel) propsTransforms.Add(Instantiate(isBig ? palmTreesPrefabs[1] : palmTreesPrefabs[0], n.position, Quaternion.Euler(Vector3.up * Random.value * 360), propParent).transform);
         else propsTransforms.Add(Instantiate(isBig ? treesPrefabs[1] : treesPrefabs[0], n.position, Quaternion.Euler(Vector3.up * Random.value * 360), propParent).transform);
     }
@@ -552,7 +554,7 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         if (node.position.y <= trueWaterLevel)
         {
             node.terrain.Add(TerrainType.Water);
-            node.isAccessible = false;
+            //node.isAccessible = false;
         }
         if (node.position.y >= trueSnowLineLevel)
         {
