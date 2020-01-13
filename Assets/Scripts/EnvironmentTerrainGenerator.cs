@@ -5,12 +5,11 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class EnvironmentTerrainGenerator : MonoBehaviour
 {
-    public int randomSeed;
-
     [Header("Environment Grid Physical Attributes")]
     public Vector2Int gridSizeInCells = Vector2Int.one * 50;
     public Vector2Int cellResolution = Vector2Int.one;
     public Vector2 cellSize = Vector2.one;
+    public static Vector2 trueCellSize;
     public Vector3 origin = Vector3.zero;
 
     [Header("Environment Terrain Proc-Gen Attributes - Height")]
@@ -53,6 +52,8 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     public Vector2Int initialTreeSeedingsCount = new Vector2Int(2, 5);
     public Vector2Int treeGrowthGenerations = new Vector2Int(3, 8);
 
+    public bool allowDiagonalTreeSpread = true;
+
     public float treeReproductionChance = 0.3f;
     public float treeDeathChance = 0.2f;
     private List<Transform> propsTransforms = new List<Transform>();
@@ -82,24 +83,19 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     private Vector3[] normals;
     private Color[] colors;
 
-    [Header("Grid Lines")]
-    public bool showGridLines = true;
-    public GameObject gridLinesProjectorPrefab;
-    public Vector3 gridProjectorOffset = new Vector3(0, 15, 0);
-    private Projector gridProjector;
-
     [Header("Pathfinding Nodes")]
     public bool allowDiagonalMovement;
-    private EnvironmentNode[,] nodeMap;
+    public static EnvironmentNode[,] nodeMap;
 
     [Header("Misc")]
-    public bool doGenerationAnimation = true;
     public float terrainAnimDuration = 2.5f;
     public float waterAnimDuration = 2.5f;
     public float propAnimDuration = 2.5f;
 
-    private void OnEnable()
+    public void Generate(int randomSeed, bool animate)
     {
+        Random.InitState(randomSeed);
+
         if (mesh == null)
         {
             mesh = new Mesh();
@@ -111,18 +107,8 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
             propParent = new GameObject("Prop Parent").transform;
             propParent.SetParent(transform);
         }
-        Generate(doGenerationAnimation);
-    }
 
-    private void Update()
-    {
-        //if (Input.GetKeyDown(KeyCode.A)) Generate(doGenerationAnimation);
-    }
-
-    public void Generate(bool animate)
-    {
-        Random.InitState(randomSeed);
-
+        trueCellSize = cellSize;
         trueWaterLevel = waterLevel * heightMultiplier + origin.y;
         trueSnowLineLevel = snowLineLevel * heightMultiplier + origin.y;
         trueCoastLineLevel = coastLineLevel * heightMultiplier + origin.y;
@@ -134,7 +120,6 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         CreateTileMap(allowDiagonalMovement);
         GenerateRocks();
         GenerateTrees();
-        RefreshGridLines();
         if (animate)
         {
             StartCoroutine(AnimateTerrainHeight(terrainAnimDuration));
@@ -142,6 +127,8 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
             StartCoroutine(AnimatePropPlacement(propAnimDuration));
         }
         else ApplyHeightAndTemperatureMap();
+
+
     }
 
     /// <summary>
@@ -156,12 +143,12 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         colors = new Color[vertices.Length];
         Vector2[] uv = new Vector2[vertices.Length];
 
-        Vector2 cellStepSize = cellSize / cellResolution;
+        Vector2 cellStepSize = trueCellSize / cellResolution;
         for (int v = 0, y = 0; y <= gridResolution.y; y++)
         {
             for (int x = 0; x <= gridResolution.x; x++, v++)
             {
-                vertices[v] = origin + new Vector3(x * cellStepSize.x, 0, y * cellStepSize.y) - new Vector3(cellSize.x, 0, cellSize.y) * 0.5f;
+                vertices[v] = origin + new Vector3(x * cellStepSize.x, 0, y * cellStepSize.y) - new Vector3(trueCellSize.x, 0, trueCellSize.y) * 0.5f;
                 colors[v] = Color.black;
                 uv[v] = new Vector2(x * cellStepSize.x, y * cellStepSize.y);
             }
@@ -237,6 +224,7 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         mesh.vertices = vertices;
         mesh.colors = colors;
         mesh.RecalculateNormals();
+        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     /// <summary>
@@ -284,9 +272,10 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
             waterQuad = quad.transform;
             waterQuad.rotation = Quaternion.Euler(Vector3.right * 90);
             waterQuad.SetParent(this.transform);
+            quad.GetComponent<MeshCollider>().enabled = false;
         }
-        waterQuad.position = origin + new Vector3((gridSizeInCells.x - 1) * cellSize.x * 0.5f, trueWaterLevel - origin.y, (gridSizeInCells.y - 1) * cellSize.y * 0.5f);
-        waterQuad.localScale = (Vector3)(gridSizeInCells * cellSize) + Vector3.forward;
+        waterQuad.position = origin + new Vector3((gridSizeInCells.x - 1) * trueCellSize.x * 0.5f, trueWaterLevel - origin.y, (gridSizeInCells.y - 1) * trueCellSize.y * 0.5f);
+        waterQuad.localScale = (Vector3)(gridSizeInCells * trueCellSize) + Vector3.forward;
     }
 
     /// <summary>
@@ -314,24 +303,9 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         while (smoothProgress < 1)
         {
             smoothProgress = Mathf.SmoothStep(0, 1, (Time.time - time) / duration);
-            propParent.localPosition = Vector3.down * Mathf.Lerp(75, 0, smoothProgress);//Magic Number!
+            propParent.localPosition = Vector3.down * Mathf.Lerp(100, 0, smoothProgress);//Magic Number!
             yield return new WaitForEndOfFrame();
         }
-    }
-
-    /// <summary>
-    /// Refreshes the grid lines that is projected onto the terrain mesh
-    /// </summary>
-    public void RefreshGridLines()
-    {
-        if (gridProjector == null)
-        {
-            gridProjector = Instantiate(gridLinesProjectorPrefab, Vector3.zero, Quaternion.Euler(Vector3.right * 90), this.transform).GetComponent<Projector>();
-        }
-        gridProjector.enabled = showGridLines;
-        gridProjector.transform.position = origin + gridProjectorOffset + new Vector3(cellSize.x * 0.5f, 0, cellSize.y * 0.5f);
-        gridProjector.orthographicSize = cellSize.y * 0.5f;
-        gridProjector.aspectRatio = cellSize.x / cellSize.y;
     }
 
     /// <summary>
@@ -371,7 +345,7 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         {
             for (int x = 0; x < gridSizeInCells.x; x++)
             {
-                nodeMap[x, y] = new EnvironmentNode(origin + new Vector3(x * cellSize.x, ApproxCellYPosition(x, y), y * cellSize.y));//Set terrain type here too?
+                nodeMap[x, y] = new EnvironmentNode(origin + new Vector3(x * trueCellSize.x, ApproxCellYPosition(x, y), y * trueCellSize.y), new Vector2Int(x, y));//Set terrain type here too?
                 DetectAndAddTerrainTypes(ref nodeMap[x, y]);
                 temp = nodeMap[x, y];
                 if (x > 0)
@@ -500,11 +474,12 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
                 {
                     for (int i = 0; i < nodeMap[v.x, v.y].connections.Count; i++)
                     {
+                        //Not using node connections in case there are portals/ladders etc (trees shouldnt spread through portals)
                         for (int dy = -1; dy <= 1; dy++)
                         {
                             for (int dx = -1; dx <= 1; dx++)
                             {
-                                if (!allowDiagonalMovement && dy * dx != 0) continue;
+                                if (!allowDiagonalTreeSpread && dy * dx != 0) continue;
                                 temp = new Vector2Int(v.x + dx, v.y + dy);
                                 if (!IsInsideMapIndex(temp)) continue;
                                 if (nodesIndexes.Contains(temp)) continue;
@@ -564,12 +539,10 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
             return (node.position.y <= trueCoastLineLevel == from.position.y <= trueCoastLineLevel);
         }
     }
-
     private bool IsInsideMapIndex(Vector2Int index)
     {
         return !(index.x < 0 || index.y < 0 || index.x >= nodeMap.GetLength(0) || index.y >= nodeMap.GetLength(1));
     }
-
     /// <summary>
     /// Checks if a node fullfill conditions to be a TerrainType and add it
     /// </summary>
@@ -585,6 +558,15 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         {
             node.terrain.Add(TerrainType.Mountain);
         }
+    }
+
+    public EnvironmentNode ConvertVectorToNode(Vector3 point)
+    {
+        point -= origin;
+        int x = (int)(point.x / trueCellSize.x + 0.5f);
+        int z = (int)(point.z / trueCellSize.y + 0.5f);
+
+        return nodeMap[x, z];
     }
 
     private void OnDrawGizmos()

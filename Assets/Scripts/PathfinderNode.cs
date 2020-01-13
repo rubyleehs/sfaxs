@@ -7,7 +7,8 @@ public interface IPathfinderNode
     List<IPathfinderNode> connections { get; set; }
 
     //Assuming all pathfindy nodes has a position
-    Vector3 position { get; set; }
+    Vector3 position { get; set; } //position of node in world space
+    Vector2Int indexPosition { get; set; } //index of node. can be used to simplyfy calculations instead of dealing with floats.
     bool isAccessible { get; set; }
     IPathfinderNode parent { get; set; } //used for A* parent node, should be moves to pathfinder
     float global { get; set; } //stores Local + current distance from goal.
