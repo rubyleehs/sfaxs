@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿/* using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,19 +10,19 @@ public class Environment : MonoBehaviour
     [SerializeField] private Vector2Int Size;
     [SerializeField] private float AccessiblePercentage;
 
-    private EnvironmentTile[][] mMap;
-    private List<EnvironmentTile> mAll; //stores all tiles
-    private List<EnvironmentTile> mLastSolution; //Only used for debugging purposes
+    private EnvironmentNode[][] mMap;
+    private List<EnvironmentNode> mAll; //stores all tiles
+    private List<EnvironmentNode> mLastSolution; //Only used for debugging purposes
 
     private readonly Vector3 NodeSize = Vector3.one * 9.0f;
     private const float TileSize = 10.0f;
     private const float TileHeight = 2.5f;
 
-    public EnvironmentTile Start { get; private set; }
+    public EnvironmentNode Start { get; private set; }
 
     private void Awake()
     {
-        mAll = new List<EnvironmentTile>();
+        mAll = new List<EnvironmentNode>();
     }
 
     private void OnDrawGizmos()
@@ -73,7 +73,7 @@ public class Environment : MonoBehaviour
         // Setup the map of the environment tiles according to the specified width and height
         // Generate tiles from the list of accessible and inaccessible prefabs using a random
         // and the specified accessible percentage
-        mMap = new EnvironmentTile[Size.x][];
+        mMap = new EnvironmentNode[Size.x][];
 
         int halfWidth = Size.x / 2;
         int halfHeight = Size.y / 2;
@@ -82,16 +82,16 @@ public class Environment : MonoBehaviour
 
         for (int x = 0; x < Size.x; ++x)
         {
-            mMap[x] = new EnvironmentTile[Size.y];
+            mMap[x] = new EnvironmentNode[Size.y];
             for (int y = 0; y < Size.y; ++y)
             {
                 bool isAccessible = start || Random.value < AccessiblePercentage;
                 List<GameObject> tiles = isAccessible ? AccessibleTiles : InaccessibleTiles;
                 GameObject prefab = tiles[Random.Range(0, tiles.Count)];
-                EnvironmentTile tile = Instantiate(prefab, position, Quaternion.identity, transform).GetComponent<EnvironmentTile>();
+                EnvironmentNode tile = Instantiate(prefab, position, Quaternion.identity, transform).GetComponent<EnvironmentNode>();
                 tile.position = new Vector3(position.x + (TileSize / 2), TileHeight, position.z + (TileSize / 2));
                 tile.isAccessible = isAccessible;
-                tile.gameObject.name = string.Format("Tile({0},{1})", x, y);
+                //tile.gameObject.name = string.Format("Tile({0},{1})", x, y);
                 mMap[x][y] = tile;
                 mAll.Add(tile);
 
@@ -116,7 +116,7 @@ public class Environment : MonoBehaviour
         {
             for (int y = 0; y < Size.y; ++y)
             {
-                EnvironmentTile tile = mMap[x][y];
+                EnvironmentNode tile = mMap[x][y];
                 tile.connections = new List<IPathfinderNode>();
                 if (x > 0)
                 {
@@ -161,7 +161,7 @@ public class Environment : MonoBehaviour
         }
     }
 
-    public List<EnvironmentTile> Solve(EnvironmentTile begin, EnvironmentTile destination)
+    public List<EnvironmentNode> Solve(EnvironmentNode begin, EnvironmentNode destination)
     {
         Debug.Log(begin + " | " + destination);
         mLastSolution = Pathfinder.Solve(mAll, begin, destination, (a, b) => Distance(a, b), (a, b) => Heuristic(a, b));
@@ -189,4 +189,4 @@ public class Environment : MonoBehaviour
         return Vector3.Distance(a.position, b.position);
     }
 
-}
+} */

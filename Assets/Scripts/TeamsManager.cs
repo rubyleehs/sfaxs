@@ -2,39 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TeamsManager
+//Does not need to inherit from Monobehavior, but i figured it be easeir to maintain if all managers can be editable from scene
+public class TeamsManager : MonoBehaviour
 {
-    private static readonly TeamsManager instance = new TeamsManager ();
-
-    public static TeamsManager Instance
-    {
-        get
-        {
-            return instance;
-        }
-    }
-
+    public static TeamsManager instance;
     public int numberOfTeams = 0;
-    private List<Team> teams = new List<Team> ();
-    private HashSet<int> teamsIds = new HashSet<int> ();
+    private List<Team> teams = new List<Team>();
+    private HashSet<int> teamsIds = new HashSet<int>();
+
+    private void Awake()
+    {
+        if (instance == null) instance = this;
+        else Destroy(this);
+    }
 
     /// <summary>
     /// Adds a team for TeamManager to be aware of, assigning it a unique id
     /// </summary>
     /// <param name="team">Team to add</param>
-    public void AddTeam (Team team)
+    public void AddTeam(Team team)
     {
-        if (team == null || teamsIds.Contains (team.id)) return;
+        if (team == null || teamsIds.Contains(team.id)) return;
 
         int newId = 0;
-        while (teamsIds.Contains (newId)) newId++;
+        while (teamsIds.Contains(newId)) newId++;
         team.id = newId;
 
-        teamsIds.Add (newId);
-        teams.Insert (newId, team);
+        teamsIds.Add(newId);
+        teams.Insert(newId, team);
         numberOfTeams++;
     }
-    public Team GetTeamByIndex (int index)
+    public Team GetTeamByIndex(int index)
     {
         return teams[index];
     }

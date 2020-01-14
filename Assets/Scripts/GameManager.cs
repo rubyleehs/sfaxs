@@ -9,11 +9,12 @@ using UnityEngine;
 //inherits from Monobehavior to take advantage of unity inbuilt coroutines inplementaions
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
     public int randomSeed;
     public EnvironmentTerrainGenerator terrainGenerator;
-    public EnviromentProjectorManager projectorManager;
     public bool doGenerationAnimation = true;
-    public Transform pTransform;
+    public Character character;
+    public Vector2Int startPos;
 
     public float movementRange = 10;
     public float inclinedMovementEffortMultiplier;
@@ -21,12 +22,21 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        if (instance == null) instance = this;
+        else Destroy(this);
+
         mainCam = Camera.main;
         terrainGenerator.Generate(randomSeed, doGenerationAnimation);
+
+        Character selectedCharacter = Instantiate(character, transform);
+        selectedCharacter.InitCharacter(EnvironmentTerrainGenerator.nodeMap[startPos.x, startPos.y]);
+        TeamsManager.instance.AddTeam(new Team(new List<Character>() { selectedCharacter }));
+        selectedCharacter = null;
     }
 
     private void Update()
     {
+        //Debug.Log(GameManager.instance);
         //if (Input.GetKeyDown(KeyCode.A)) terrainGenerator.Generate(randomSeed, doGenerationAnimation);
         if (Input.GetButtonDown("Fire1")) Click();
     }
@@ -39,40 +49,21 @@ public class GameManager : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         {
             Transform objectHit = hit.transform;
-            if (objectHit == terrainGenerator.transform) ShowMovementRange(terrainGenerator.ConvertVectorToNode(hit.point), movementRange, PathfindingD);
-            else projectorManager.RefreshMovementRangeProjection(null, Vector2Int.zero);
+            if (objectHit == terrainGenerator.transform)
+            {
+                if (SelectionManager.instance.currentlySelected != null)
+                {
+                    Character selectedCharacter = SelectionManager.instance.currentlySelected as Character;
+                    if (selectedCharacter != null) selectedCharacter.TryGoTo(terrainGenerator.ConvertVectorToNode(hit.point));
+                }
+            }
         }
         else
         {
-            projectorManager.RefreshMovementRangeProjection(null, Vector2Int.zero); //click Manager???
+            EnviromentProjectorManager.instance.RefreshMovementRangeProjection(null, Vector2Int.zero); //click Manager???
         }
     }
 
-    public void ShowMovementRange(EnvironmentNode node, float movementRange, Func<EnvironmentNode, EnvironmentNode, float> rangeFunc)
-    {
-        HashSet<EnvironmentNode> r = Pathfinder.IsInRange(EnvironmentTerrainGenerator.allNodes, node, movementRange, rangeFunc);
-        int xMin = int.MaxValue, xMax = int.MinValue, yMin = int.MaxValue, yMax = int.MinValue;
-        int temp;
-        foreach (EnvironmentNode n in r)
-        {
-            temp = n.indexPosition.x - node.indexPosition.x;
-            xMin = Mathf.Min(xMin, temp);
-            xMax = Mathf.Max(xMax, temp);
-            temp = n.indexPosition.y - node.indexPosition.y;
-            yMin = Mathf.Min(yMin, temp);
-            yMax = Mathf.Max(yMax, temp);
-        }
-
-        Vector2Int movementRangeInTiles = new Vector2Int(Mathf.Max(-xMin, xMax), Mathf.Max(-yMin, yMax));
-        Vector2Int delta = movementRangeInTiles - node.indexPosition;
-        bool[,] b = new bool[movementRangeInTiles.x * 2 + 1, movementRangeInTiles.y * 2 + 1];
-        foreach (EnvironmentNode v in r)
-        {
-            b[v.indexPosition.x + delta.x, v.indexPosition.y + delta.y] = true;
-        }
-
-        projectorManager.RefreshMovementRangeProjection(b, node.indexPosition);
-    }
 
     //Should be on the character themselves
     public float PathfindingD(EnvironmentNode n1, EnvironmentNode n2)

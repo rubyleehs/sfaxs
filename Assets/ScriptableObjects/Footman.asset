@@ -12,8 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2f728588c079ea4ab907152373a8712, type: 3}
   m_Name: Footman
   m_EditorClassIdentifier: 
-  model: {fileID: 0}
-  hp: 0
-  moveRange: 0
+  hp: 100
+  moveRange: 6
   movePeriod: 0.5
-  inclinedMovementEffortMultiplier: 0
+  inclinedMovementEffortMultiplier: 9
+  I_navigatableTerrainWeightages:
+  - type: 0
+    value: 2.5
+  - type: 3
+    value: 1.5
+  I_unnavigatableTerrain: 04000000

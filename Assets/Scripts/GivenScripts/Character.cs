@@ -1,19 +1,31 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 //TODO. SPAWN PLAYER
-public class Character : MonoBehaviour
+public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
 {
     public CharacterClass characterClass;
-    public EnvironmentTile currentPosition { get; set; }
+    public EnvironmentNode currentNode { get; set; }
     public int teamId { get; set; } = -1;
     public int currentHp { get; set; }
 
-    private void Awake()
+    public HashSet<EnvironmentNode> nodesInRange;
+
+    public void InitCharacter(EnvironmentNode startNode, int teamId = -1)
     {
-        //currentHp = characterClass.hp;
+        if (characterClass.unnavigableTerrain == null) characterClass.SetupCharacterClass();
+        currentNode = startNode;
+        this.teamId = teamId;
+        currentHp = characterClass.hp;
+
+        transform.position = currentNode.position;
+
+        NotifySelectionManager();
     }
+
+
     private IEnumerator DoMove(Vector3 position, Vector3 destination)
     {
         // Move between the two specified positions over the specified amount of time
@@ -34,43 +46,40 @@ public class Character : MonoBehaviour
         }
     }
 
-    private IEnumerator DoGoTo(List<EnvironmentTile> route)
+    private IEnumerator DoGoTo(List<EnvironmentNode> route)
     {
         // Move through each tile in the given route
         if (route != null)
         {
-            Vector3 position = currentPosition.position;
+            Vector3 position = currentNode.position;
             for (int count = 0; count < route.Count; ++count)
             {
                 Vector3 next = route[count].position;
                 yield return DoMove(position, next);
-                currentPosition = route[count];
+                currentNode = route[count];
+                Debug.Log(currentNode.indexPosition);
                 position = next;
             }
         }
     }
 
-    public void GoTo(List<EnvironmentTile> route)
+    public void GoTo(List<EnvironmentNode> route)
     {
-        Debug.Log(route.Count);
         // Clear all coroutines before starting the new route so 
         // that clicks can interupt any current route animation
         StopAllCoroutines();
         StartCoroutine(DoGoTo(route));
+
+        nodesInRange = null;
     }
 
-    //Should do Instantiation by game manager
-    /*
-    public static void InstantiateNewCharacter (CharacterClass characterClass, EnvironmentTile position, Team team)
+    public void TryGoTo(EnvironmentNode n)
     {
-        Character character = new Character ();
-        character.characterClass = characterClass;
-        character.currentPosition = position;
-        character.teamId = team.id;
+        if (nodesInRange == null) nodesInRange = Pathfinder.IsInRange(EnvironmentTerrainGenerator.allNodes, currentNode, characterClass.moveRange, PathfindingD);
+        if (nodesInRange.Contains(n)) GoTo(Pathfinder.Solve(EnvironmentTerrainGenerator.allNodes, currentNode, n, PathfindingD, PathfindingH));
 
-        Instantiate
+        SelectionManager.instance.Deselect();
     }
-    */
 
     public float PathfindingD(EnvironmentNode n1, EnvironmentNode n2)
     {
@@ -87,5 +96,23 @@ public class Character : MonoBehaviour
     {
         return Mathf.Sqrt(Vector2.SqrMagnitude(n1.indexPosition - n2.indexPosition) + Mathf.Pow(n2.effortWeightage - n1.effortWeightage, 2));
     }
-
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        SelectionManager.instance.Select(this);
+    }
+    public void NotifySelectionManager()
+    {
+        SelectionManager.instance.AddToSelection(this);
+    }
+    public void OnSelect()
+    {
+        Debug.Log("Selected!");
+        if (nodesInRange == null) nodesInRange = Pathfinder.IsInRange(EnvironmentTerrainGenerator.allNodes, currentNode, characterClass.moveRange, PathfindingD);
+        EnviromentProjectorManager.instance.RefreshMovementRangeProjection(nodesInRange, currentNode);
+    }
+    public void OnDeselect()
+    {
+        EnviromentProjectorManager.instance.RefreshMovementRangeProjection(null, currentNode.indexPosition);
+        Debug.Log("Deselected!");
+    }
 }

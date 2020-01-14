@@ -541,10 +541,15 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
             return (node.position.y <= trueCoastLineLevel == from.position.y <= trueCoastLineLevel);
         }
     }
+
+    /// <summary>
+    /// Checks if index is > 0 and <= nodeMap.Length
+    /// </summary>
     private bool IsInsideMapIndex(Vector2Int index)
     {
         return !(index.x < 0 || index.y < 0 || index.x >= nodeMap.GetLength(0) || index.y >= nodeMap.GetLength(1));
     }
+
     /// <summary>
     /// Checks if a node fullfill conditions to be a TerrainType and add it
     /// </summary>
@@ -562,6 +567,9 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Converts a world space vector to it's associated EnviromentNode
+    /// </summary>
     public EnvironmentNode ConvertVectorToNode(Vector3 point)
     {
         point -= origin;

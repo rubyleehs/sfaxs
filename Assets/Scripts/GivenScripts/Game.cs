@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿/* using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -36,10 +36,10 @@ public class Game : MonoBehaviour
             int hits = Physics.RaycastNonAlloc(screenClick, mRaycastHits);
             if (hits > 0)
             {
-                EnvironmentTile tile = mRaycastHits[0].transform.GetComponent<EnvironmentTile>();
+                EnvironmentNode tile = mRaycastHits[0].transform.GetComponent<EnvironmentNode>();
                 if (tile != null)
                 {
-                    List<EnvironmentTile> route = mMap.Solve(mCharacter.currentPosition, tile);
+                    List<EnvironmentNode> route = mMap.Solve(mCharacter.currentNode, tile);
                     mCharacter.GoTo(route);
                 }
             }
@@ -63,7 +63,7 @@ public class Game : MonoBehaviour
             {
                 mCharacter.transform.position = mMap.Start.position;
                 mCharacter.transform.rotation = Quaternion.identity;
-                mCharacter.currentPosition = mMap.Start;
+                mCharacter.currentNode = mMap.Start;
             }
         }
     }
@@ -79,4 +79,4 @@ public class Game : MonoBehaviour
         Application.Quit ();
 #endif
     }
-}
+} */

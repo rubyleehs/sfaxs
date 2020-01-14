@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 51692301}
   - component: {fileID: 51692300}
   - component: {fileID: 51692299}
+  - component: {fileID: 51692302}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -203,6 +204,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 55, y: 0, z: 0}
+--- !u!114 &51692302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 51692298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c49b4cc203aa6414fae5c798d1d0e7d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EventMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_MaxRayIntersections: 1
 --- !u!1 &960029498
 GameObject:
   m_ObjectHideFlags: 0
@@ -233,6 +250,72 @@ Transform:
   - {fileID: 8878479743516700153}
   m_Father: {fileID: 1345968556}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &979240275
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 979240278}
+  - component: {fileID: 979240277}
+  - component: {fileID: 979240276}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &979240276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979240275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &979240277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979240275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!4 &979240278
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979240275}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1345968552
 GameObject:
@@ -334,7 +417,7 @@ MonoBehaviour:
   waterMat: {fileID: 2100000, guid: aa75a5d44fdb272498cb6215ab8dc743, type: 2}
   snowLineLevel: 1
   coastLineLevel: 0.375
-  allowDiagonalMovement: 0
+  allowDiagonalMovement: 1
   terrainAnimDuration: 1.62
   waterAnimDuration: 2.43
   propAnimDuration: 3.24
@@ -424,6 +507,8 @@ GameObject:
   - component: {fileID: 1452945247}
   - component: {fileID: 1452945246}
   - component: {fileID: 1452945248}
+  - component: {fileID: 1452945249}
+  - component: {fileID: 1452945250}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -443,12 +528,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70372b9efd6c29f43989f83ecaae8870, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  randomSeed: 6
+  randomSeed: 9
   terrainGenerator: {fileID: 1345968553}
-  projectorManager: {fileID: 1452945248}
-  doGenerationAnimation: 0
-  pTransform: {fileID: 8878479743516700153}
-  steps: 15
+  doGenerationAnimation: 1
+  character: {fileID: 7648334134218235174, guid: 2350c54af8102e845819ba6692631c8c,
+    type: 3}
+  startPos: {x: 0, y: 0}
+  movementRange: 6
+  inclinedMovementEffortMultiplier: 9
 --- !u!4 &1452945247
 Transform:
   m_ObjectHideFlags: 0
@@ -484,6 +571,31 @@ MonoBehaviour:
   moveRangeTexture: {fileID: 2800000, guid: 9906a378ff84f4048bc72cc3defeb4a5, type: 3}
   projectorsParent: {fileID: 960029499}
   projectorsHeight: -6.5
+--- !u!114 &1452945249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1452945245}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0cb6dd2c85929f479ebb8221be918d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfTeams: 0
+--- !u!114 &1452945250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1452945245}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 422a7a3472fc5cd4e886c31758d9a5ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1870917780
 GameObject:
   m_ObjectHideFlags: 0

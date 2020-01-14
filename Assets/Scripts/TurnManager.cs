@@ -15,36 +15,36 @@ public class TurnManager : MonoBehaviour
 
     private int turnCount = 0;
 
-    private void Awake ()
+    private void Awake()
     {
         if (instance == null) instance = this;
-        else Destroy (this);
+        else Destroy(this);
     }
-    public void StartNextTurn ()
+    public void StartNextTurn()
     {
-        StartNewTurn ((currentTurnTeamIndex + 1) % TeamsManager.Instance.numberOfTeams);
+        StartNewTurn((currentTurnTeamIndex + 1) % TeamsManager.instance.numberOfTeams);
     }
 
-    public void StartNewTurn (int teamIndex)
+    public void StartNewTurn(int teamIndex)
     {
-        List<Character> characterList = TeamsManager.Instance.GetTeamByIndex (teamIndex).members;
+        List<Character> characterList = TeamsManager.instance.GetTeamByIndex(teamIndex).members;
     }
-    public void StartNewTurn (List<Character> charactersToMoveThisTurn)
+    public void StartNewTurn(List<Character> charactersToMoveThisTurn)
     {
         turnCount++;
-        movableCharactersOnTurn.Clear ();
+        movableCharactersOnTurn.Clear();
         movableCharactersOnTurn = charactersToMoveThisTurn;
     }
 
-    public void EndCharacterTurn (Character character)
+    public void EndCharacterTurn(Character character)
     {
-        movableCharactersOnTurn.Remove (character);
-        if (movableCharactersOnTurn.Count <= 0) StartNextTurn ();
+        movableCharactersOnTurn.Remove(character);
+        if (movableCharactersOnTurn.Count <= 0) StartNextTurn();
     }
 
-    public bool IsStillCharacterTurn (Character character)
+    public bool IsStillCharacterTurn(Character character)
     {
-        return movableCharactersOnTurn.Contains (character);
+        return movableCharactersOnTurn.Contains(character);
     }
 
 }
