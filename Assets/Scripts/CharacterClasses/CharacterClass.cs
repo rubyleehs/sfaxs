@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(menuName = "CharacterClass")]
 public class CharacterClass : ScriptableObject
 {
-    public GameObject model;
     public int hp;
-    public int moveRange;
-    public HashSet<TerrainType> navigatableTerrain;
+    public float moveRange, movePeriod = 0.5f;
+    public float inclinedMovementEffortMultiplier;
+    public Dictionary<TerrainType, float> navigatableTerrainWeightage;
+    public HashSet<TerrainType> unnavigableTerrain;
 }

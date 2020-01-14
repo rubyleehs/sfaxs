@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public Transform pTransform;
 
     public float movementRange = 10;
-    public float uphillMovementWeightageMultiplier;
+    public float inclinedMovementEffortMultiplier;
     private Camera mainCam;
 
     private void Awake()
@@ -46,42 +46,6 @@ public class GameManager : MonoBehaviour
         {
             projectorManager.RefreshMovementRangeProjection(null, Vector2Int.zero); //click Manager???
         }
-    }
-
-    public void ShowMovementRange(EnvironmentNode node, int steps)
-    {
-        HashSet<Vector2Int> n1 = new HashSet<Vector2Int>();
-        HashSet<Vector2Int> n2 = new HashSet<Vector2Int>();
-        EnvironmentNode temp;
-        n1.Add(node.indexPosition);
-
-        for (int s = 0; s < steps; s++)
-        {
-            foreach (Vector2Int v in n1)
-            {
-                temp = EnvironmentTerrainGenerator.nodeMap[v.x, v.y];
-                for (int i = 0; i < temp.connections.Count; i++)
-                {
-                    if (n1.Contains(temp.connections[i].indexPosition)) continue;
-                    if (temp.connections[i].isAccessible) n2.Add(temp.connections[i].indexPosition);
-                }
-            }
-
-            foreach (Vector2Int v in n2)
-            {
-                n1.Add(v);
-            }
-            n2.Clear();
-        }
-
-        Vector2Int delta = Vector2Int.one * steps - node.indexPosition;
-        bool[,] b = new bool[steps * 2 + 1, steps * 2 + 1];
-        foreach (Vector2Int v in n1)
-        {
-            b[v.x + delta.x, v.y + delta.y] = true;
-        }
-
-        projectorManager.RefreshMovementRangeProjection(b, node.indexPosition);
     }
 
     public void ShowMovementRange(EnvironmentNode node, float movementRange, Func<EnvironmentNode, EnvironmentNode, float> rangeFunc)
@@ -117,7 +81,7 @@ public class GameManager : MonoBehaviour
         float cost; //= Mathf.Sqrt(Vector2.SqrMagnitude(n1.indexPosition - n2.indexPosition) + ((n2.effortWeightage < n1.effortWeightage) ? 0 : Mathf.Pow((n2.effortWeightage - n1.effortWeightage) *uphillMovementWeightageMultiplier, 2)));
         cost = Vector2.Distance(n1.indexPosition, n2.indexPosition);
         if (n2.terrain.Contains(TerrainType.Water)) return cost * 2f;
-        cost += (n2.effortWeightage - n1.effortWeightage) * uphillMovementWeightageMultiplier;
+        cost += (n2.effortWeightage - n1.effortWeightage) * inclinedMovementEffortMultiplier;
         //Debug.Log((n2.effortWeightage - n1.effortWeightage) * uphillMovementWeightageMultiplier);
         if (n2.terrain.Contains(TerrainType.Trees)) cost *= 1.5f;
         return cost;

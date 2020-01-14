@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//Changed to abstract + formatting. Added teamId property
+//TODO. SPAWN PLAYER
 public class Character : MonoBehaviour
 {
-    [SerializeField] private float singleNodeMoveTime = 0.5f;
     public CharacterClass characterClass;
-
     public EnvironmentTile currentPosition { get; set; }
     public int teamId { get; set; } = -1;
     public int currentHp { get; set; }
@@ -26,10 +24,10 @@ public class Character : MonoBehaviour
             Vector3 p = transform.position;
             float t = 0.0f;
 
-            while (t < singleNodeMoveTime)
+            while (t < characterClass.movePeriod)
             {
                 t += Time.deltaTime;
-                p = Vector3.Lerp(position, destination, t / singleNodeMoveTime);
+                p = Vector3.Lerp(position, destination, t / characterClass.movePeriod);
                 transform.position = p;
                 yield return null;
             }
@@ -73,4 +71,21 @@ public class Character : MonoBehaviour
         Instantiate
     }
     */
+
+    public float PathfindingD(EnvironmentNode n1, EnvironmentNode n2)
+    {
+        float cost = Vector2.Distance(n1.indexPosition, n2.indexPosition);
+        if (!n2.terrain.Contains(TerrainType.Water)) cost += (n2.effortWeightage - n1.effortWeightage) * characterClass.inclinedMovementEffortMultiplier;
+        foreach (TerrainType terrainType in n2.terrain)
+        {
+            if (characterClass.unnavigableTerrain.Contains(terrainType)) return float.MaxValue;
+            if (characterClass.navigatableTerrainWeightage.ContainsKey(terrainType)) cost *= characterClass.navigatableTerrainWeightage[terrainType];
+        }
+        return cost;
+    }
+    public float PathfindingH(EnvironmentNode n1, EnvironmentNode n2)
+    {
+        return Mathf.Sqrt(Vector2.SqrMagnitude(n1.indexPosition - n2.indexPosition) + Mathf.Pow(n2.effortWeightage - n1.effortWeightage, 2));
+    }
+
 }
