@@ -61,7 +61,7 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     [Header("Water")]
     public float waterLevel = 0.3f;
     public Material waterMat;
-    private Transform waterQuad;
+    public Transform waterQuad;
 
     [Header("Snow")]//Not implemented yet, planned for
     public float snowLineLevel;
@@ -123,8 +123,6 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
             StartCoroutine(AnimatePropPlacement(propAnimDuration));
         }
         else ApplyHeightAndTemperatureMap();
-
-
     }
 
     /// <summary>
@@ -270,7 +268,7 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
             waterQuad.rotation = Quaternion.Euler(Vector3.right * 90);
             waterQuad.SetParent(this.transform);
 
-            quad.GetComponent<MeshCollider>().enabled = false;
+            quad.GetComponent<MeshCollider>().enabled = false; //LINE IN QUESTION
         }
         waterQuad.position = EnvironmentManager.trueOrigin + new Vector3((gridSizeInCells.x - 1) * EnvironmentManager.trueCellSize.x * 0.5f, EnvironmentManager.trueWaterLevel - EnvironmentManager.trueOrigin.y, (gridSizeInCells.y - 1) * EnvironmentManager.trueCellSize.y * 0.5f);
         waterQuad.localScale = (Vector3)(gridSizeInCells * EnvironmentManager.trueCellSize) + Vector3.forward;

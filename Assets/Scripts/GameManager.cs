@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour
         selectedCharacter.InitCharacter(EnvironmentManager.nodeMap[startPos.x, startPos.y]);
         TeamsManager.instance.AddTeam(new Team(new List<Character>() { selectedCharacter }));
         selectedCharacter = null;
+
+        //EnvironmentManager.instance.terrainGenerator.waterQuad.GetComponent<>().enabled = true;
     }
 
     private void Update()

@@ -512,6 +512,7 @@ MonoBehaviour:
   treeDeathChance: 0.2
   waterLevel: 0.3
   waterMat: {fileID: 2100000, guid: aa75a5d44fdb272498cb6215ab8dc743, type: 2}
+  waterQuad: {fileID: 0}
   snowLineLevel: 1
   coastLineLevel: 0.375
   allowDiagonalMovement: 1
@@ -630,7 +631,7 @@ MonoBehaviour:
   doGenerationAnimation: 1
   character: {fileID: 7648334134218235174, guid: 2350c54af8102e845819ba6692631c8c,
     type: 3}
-  startPos: {x: 15, y: 15}
+  startPos: {x: 30, y: 15}
 --- !u!4 &1452945247
 Transform:
   m_ObjectHideFlags: 0
