@@ -533,7 +533,7 @@ MonoBehaviour:
   doGenerationAnimation: 1
   character: {fileID: 7648334134218235174, guid: 2350c54af8102e845819ba6692631c8c,
     type: 3}
-  startPos: {x: 0, y: 0}
+  startPos: {x: 15, y: 15}
   movementRange: 6
   inclinedMovementEffortMultiplier: 9
 --- !u!4 &1452945247

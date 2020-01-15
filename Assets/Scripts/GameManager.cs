@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
         terrainGenerator.Generate(randomSeed, doGenerationAnimation);
 
         Character selectedCharacter = Instantiate(character, transform);
-        selectedCharacter.InitCharacter(EnvironmentTerrainGenerator.nodeMap[startPos.x, startPos.y]);
+        selectedCharacter.InitCharacter(EnvironmentManager.nodeMap[startPos.x, startPos.y]);
         TeamsManager.instance.AddTeam(new Team(new List<Character>() { selectedCharacter }));
         selectedCharacter = null;
     }
@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            EnviromentProjectorManager.instance.RefreshMovementRangeProjection(null, Vector2Int.zero); //click Manager???
+            EnvironmentManager.instance.RefreshMovementRangeProjection(null, Vector2Int.zero); //click Manager???
         }
     }
 

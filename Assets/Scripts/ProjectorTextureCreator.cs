@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProjectorTextureCreator : MonoBehaviour
+public static class ProjectorTextureCreator
 {
-    protected void UpdateTexture<T>(ref Texture2D tex, T[,] arr, Func<T, bool> func, Color c, Vector2Int cellSize)
+    public static void UpdateTexture<T>(ref Texture2D tex, T[,] arr, Func<T, bool> func, Color c, Vector2Int cellSize)
     {
         UpdateTexture(ref tex, arr, (T a) => func(a) ? 0 : -1, new Color[1] { c }, cellSize);
     }
-    protected void UpdateTexture<T>(ref Texture2D tex, T[,] arr, Func<T, int> func, Color[] c, Vector2Int cellSize)
+    public static void UpdateTexture<T>(ref Texture2D tex, T[,] arr, Func<T, int> func, Color[] c, Vector2Int cellSize)
     {
         Color[,] colors = new Color[arr.GetLength(0) + 2, arr.GetLength(1) + 2];
         int temp;
@@ -24,7 +24,7 @@ public class ProjectorTextureCreator : MonoBehaviour
         UpdateTexture(ref tex, colors, cellSize);
     }
 
-    protected void UpdateTexture(ref Texture2D tex, Color[,] c, Vector2Int cellSize)
+    public static void UpdateTexture(ref Texture2D tex, Color[,] c, Vector2Int cellSize)
     {
         int sizeX = c.GetLength(0) * cellSize.x, sizeY = c.GetLength(1) * cellSize.y;
         tex.Resize(sizeX, sizeY, TextureFormat.ARGB32, false);
@@ -32,7 +32,7 @@ public class ProjectorTextureCreator : MonoBehaviour
         tex.Apply();
     }
 
-    private T[] Flatten2DArray<T>(T[,] arr, Vector2Int cellSize)
+    public static T[] Flatten2DArray<T>(T[,] arr, Vector2Int cellSize)
     {
         T[] result = new T[arr.GetLength(0) * cellSize.x * arr.GetLength(1) * cellSize.y];
         T val;

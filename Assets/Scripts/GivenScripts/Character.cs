@@ -35,11 +35,12 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
 
             Vector3 p = transform.position;
             float t = 0.0f;
+            float movePeriod = Vector3.Distance(position, destination) / characterClass.moveSpeed;
 
-            while (t < characterClass.movePeriod)
+            while (t < movePeriod)
             {
                 t += Time.deltaTime;
-                p = Vector3.Lerp(position, destination, t / characterClass.movePeriod);
+                p = Vector3.Lerp(position, destination, t / movePeriod);
                 transform.position = p;
                 yield return null;
             }
@@ -57,7 +58,6 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
                 Vector3 next = route[count].position;
                 yield return DoMove(position, next);
                 currentNode = route[count];
-                Debug.Log(currentNode.indexPosition);
                 position = next;
             }
         }
@@ -75,8 +75,8 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
 
     public void TryGoTo(EnvironmentNode n)
     {
-        if (nodesInRange == null) nodesInRange = Pathfinder.IsInRange(EnvironmentTerrainGenerator.allNodes, currentNode, characterClass.moveRange, PathfindingD);
-        if (nodesInRange.Contains(n)) GoTo(Pathfinder.Solve(EnvironmentTerrainGenerator.allNodes, currentNode, n, PathfindingD, PathfindingH));
+        if (nodesInRange == null) nodesInRange = Pathfinder.IsInRange(EnvironmentManager.allNodes, currentNode, characterClass.moveRange, PathfindingD);
+        if (nodesInRange.Contains(n)) GoTo(Pathfinder.Solve(EnvironmentManager.allNodes, currentNode, n, PathfindingD, PathfindingH));
 
         SelectionManager.instance.Deselect();
     }
@@ -107,12 +107,12 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
     public void OnSelect()
     {
         Debug.Log("Selected!");
-        if (nodesInRange == null) nodesInRange = Pathfinder.IsInRange(EnvironmentTerrainGenerator.allNodes, currentNode, characterClass.moveRange, PathfindingD);
-        EnviromentProjectorManager.instance.RefreshMovementRangeProjection(nodesInRange, currentNode);
+        if (nodesInRange == null) nodesInRange = Pathfinder.IsInRange(EnvironmentManager.allNodes, currentNode, characterClass.moveRange, PathfindingD);
+        EnvironmentManager.instance.RefreshMovementRangeProjection(nodesInRange, currentNode);
     }
     public void OnDeselect()
     {
-        EnviromentProjectorManager.instance.RefreshMovementRangeProjection(null, currentNode.indexPosition);
+        EnvironmentManager.instance.RefreshMovementRangeProjection(null, currentNode.indexPosition);
         Debug.Log("Deselected!");
     }
 }

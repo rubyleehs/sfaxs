@@ -3,9 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnviromentProjectorManager : ProjectorTextureCreator
+public class EnvironmentManager : MonoBehaviour
 {
-    public static EnviromentProjectorManager instance;
+    [Header("Statics")]
+    public static EnvironmentManager instance;
+    public static Vector3 trueOrigin;
+    public static Vector2 trueCellSize;
+    public static float trueWaterLevel;
+    public static float trueSnowLineLevel;
+    public static float trueCoastLineLevel;
+    public static EnvironmentNode[,] nodeMap;
+    public static List<EnvironmentNode> allNodes = new List<EnvironmentNode>();
 
     [Header("Grid Lines")]
     public bool showGridLines = true;
@@ -46,9 +54,9 @@ public class EnviromentProjectorManager : ProjectorTextureCreator
             gridProjector = Instantiate(gridLinesProjectorPrefab, Vector3.zero, Quaternion.Euler(Vector3.right * 90), projectorsParent).GetComponent<Projector>();
         }
         gridProjector.enabled = showGridLines;
-        gridProjector.transform.position = new Vector3(gridProjectorOffset.x, projectorsHeight, gridProjectorOffset.y) + new Vector3(EnvironmentTerrainGenerator.trueCellSize.x * 0.5f, 0, EnvironmentTerrainGenerator.trueCellSize.y * 0.5f);
-        gridProjector.orthographicSize = EnvironmentTerrainGenerator.trueCellSize.y * 0.5f;
-        gridProjector.aspectRatio = EnvironmentTerrainGenerator.trueCellSize.x / EnvironmentTerrainGenerator.trueCellSize.y;
+        gridProjector.transform.position = new Vector3(gridProjectorOffset.x, projectorsHeight, gridProjectorOffset.y) + new Vector3(EnvironmentManager.trueCellSize.x * 0.5f, 0, EnvironmentManager.trueCellSize.y * 0.5f);
+        gridProjector.orthographicSize = EnvironmentManager.trueCellSize.y * 0.5f;
+        gridProjector.aspectRatio = EnvironmentManager.trueCellSize.x / EnvironmentManager.trueCellSize.y;
     }
     public void RefreshMovementRangeProjection(bool[,] map, Vector2Int center)
     {
@@ -58,11 +66,11 @@ public class EnviromentProjectorManager : ProjectorTextureCreator
             return;
         }
         else moveRangeProjector.enabled = true;
-        UpdateTexture(ref moveRangeTexture, map, (a) => a, moveRangeColor, Vector2Int.one);
-        Vector3 temp = EnvironmentTerrainGenerator.nodeMap[center.x, center.y].position;
+        ProjectorTextureCreator.UpdateTexture(ref moveRangeTexture, map, (a) => a, moveRangeColor, Vector2Int.one);
+        Vector3 temp = EnvironmentManager.nodeMap[center.x, center.y].position;
         moveRangeProjector.transform.position = new Vector3(temp.x, projectorsHeight, temp.z);
-        moveRangeProjector.orthographicSize = (map.GetLength(1) + 2) * 0.5f * EnvironmentTerrainGenerator.trueCellSize.y;
-        moveRangeProjector.aspectRatio = ((map.GetLength(0) + 2) * EnvironmentTerrainGenerator.trueCellSize.x) / ((map.GetLength(1) + 2) * EnvironmentTerrainGenerator.trueCellSize.y);
+        moveRangeProjector.orthographicSize = (map.GetLength(1) + 2) * 0.5f * EnvironmentManager.trueCellSize.y;
+        moveRangeProjector.aspectRatio = ((map.GetLength(0) + 2) * EnvironmentManager.trueCellSize.x) / ((map.GetLength(1) + 2) * EnvironmentManager.trueCellSize.y);
     }
 
     public void RefreshMovementRangeProjection(HashSet<EnvironmentNode> nodes, EnvironmentNode center)

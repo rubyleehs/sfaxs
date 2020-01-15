@@ -15,7 +15,6 @@ public class SelectionManager : MonoBehaviour
     {
         if (instance == null) instance = this;
         else Destroy(this);
-
         selection = new List<ISelectable>();
     }
 
