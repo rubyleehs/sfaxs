@@ -46,7 +46,8 @@ public class GameManager : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         {
             Transform objectHit = hit.transform;
-            if (objectHit == terrainGenerator.transform)
+            //Debug.Log(objectHit.name);
+            if (hit.transform.gameObject.layer == terrainGenerator.gameObject.layer)
             {
                 if (SelectionManager.instance.currentlySelected != null)
                 {

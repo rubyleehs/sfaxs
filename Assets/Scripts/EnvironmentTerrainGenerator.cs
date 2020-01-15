@@ -264,10 +264,12 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         {
             GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
             quad.name = "Water";
+            quad.layer = this.gameObject.layer;
             quad.GetComponent<MeshRenderer>().material = waterMat;
             waterQuad = quad.transform;
             waterQuad.rotation = Quaternion.Euler(Vector3.right * 90);
             waterQuad.SetParent(this.transform);
+
             quad.GetComponent<MeshCollider>().enabled = false;
         }
         waterQuad.position = EnvironmentManager.trueOrigin + new Vector3((gridSizeInCells.x - 1) * EnvironmentManager.trueCellSize.x * 0.5f, EnvironmentManager.trueWaterLevel - EnvironmentManager.trueOrigin.y, (gridSizeInCells.y - 1) * EnvironmentManager.trueCellSize.y * 0.5f);
@@ -387,7 +389,6 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     {
         Vector2Int size = gridResolution + Vector2Int.one;
         float temp = EnvironmentManager.trueOrigin.y + (heightMap[y * size.x * cellResolution.y + x * cellResolution.x] + heightMap[(y + 1) * size.x * cellResolution.y + (x + 1) * cellResolution.x]) * 0.5f * heightMultiplier;
-        Debug.Log(temp + " | " + EnvironmentManager.trueWaterLevel);
         return Mathf.Max(EnvironmentManager.trueWaterLevel, temp);
     }
 

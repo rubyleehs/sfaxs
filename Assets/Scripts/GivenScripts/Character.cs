@@ -100,6 +100,7 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
     }
     public void OnPointerClick(PointerEventData eventData)
     {
+        Debug.Log("Click!");
         SelectionManager.instance.Select(this);
     }
     public void NotifySelectionManager()
