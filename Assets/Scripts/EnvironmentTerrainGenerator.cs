@@ -342,7 +342,7 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
             for (int x = 0; x < gridSizeInCells.x; x++)
             {
                 cellYPos = ApproxCellYPosition(x, y);
-                EnvironmentManager.nodeMap[x, y] = new EnvironmentNode(EnvironmentManager.trueOrigin + new Vector3(x * EnvironmentManager.trueCellSize.x, cellYPos, y * EnvironmentManager.trueCellSize.y), new Vector2Int(x, y), cellYPos / heightMultiplier);//Set terrain type here too?
+                EnvironmentManager.nodeMap[x, y] = new EnvironmentNode(new Vector3(x * EnvironmentManager.trueCellSize.x + EnvironmentManager.trueOrigin.x, cellYPos, y * EnvironmentManager.trueCellSize.y + EnvironmentManager.trueOrigin.z), new Vector2Int(x, y), cellYPos / heightMultiplier);
                 EnvironmentManager.allNodes.Add(EnvironmentManager.nodeMap[x, y]);
                 DetectAndAddTerrainTypes(ref EnvironmentManager.nodeMap[x, y]);
                 temp = EnvironmentManager.nodeMap[x, y];
@@ -386,7 +386,9 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     private float ApproxCellYPosition(int x, int y)
     {
         Vector2Int size = gridResolution + Vector2Int.one;
-        return (heightMap[y * size.x * cellResolution.y + x * cellResolution.x] + heightMap[(y + 1) * size.x * cellResolution.y + (x + 1) * cellResolution.x]) * 0.5f * heightMultiplier;
+        float temp = EnvironmentManager.trueOrigin.y + (heightMap[y * size.x * cellResolution.y + x * cellResolution.x] + heightMap[(y + 1) * size.x * cellResolution.y + (x + 1) * cellResolution.x]) * 0.5f * heightMultiplier;
+        Debug.Log(temp + " | " + EnvironmentManager.trueWaterLevel);
+        return Mathf.Max(EnvironmentManager.trueWaterLevel, temp);
     }
 
     /// <summary>
@@ -420,7 +422,7 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
     /// <param name="nodeIndex">Index of node to check. </param>
     private bool CanPlaceRock(Vector2Int nodeIndex)
     {
-        return !(EnvironmentManager.nodeMap[nodeIndex.x, nodeIndex.y].terrain.Contains(TerrainType.Boulder) || EnvironmentManager.nodeMap[nodeIndex.x, nodeIndex.y].terrain.Contains(TerrainType.Trees));
+        return !(EnvironmentManager.nodeMap[nodeIndex.x, nodeIndex.y].terrain.Contains(TerrainType.Boulder) || EnvironmentManager.nodeMap[nodeIndex.x, nodeIndex.y].terrain.Contains(TerrainType.Trees) || EnvironmentManager.nodeMap[nodeIndex.x, nodeIndex.y].terrain.Contains(TerrainType.Water));
     }
 
     /// <summary>
@@ -560,18 +562,6 @@ public class EnvironmentTerrainGenerator : MonoBehaviour
         {
             node.terrain.Add(TerrainType.Mountain);
         }
-    }
-
-    /// <summary>
-    /// Converts a world space vector to it's associated EnviromentNode
-    /// </summary>
-    public EnvironmentNode ConvertVectorToNode(Vector3 point)
-    {
-        point -= EnvironmentManager.trueOrigin;
-        int x = (int)(point.x / EnvironmentManager.trueCellSize.x + 0.5f);
-        int z = (int)(point.z / EnvironmentManager.trueCellSize.y + 0.5f);
-
-        return EnvironmentManager.nodeMap[x, z];
     }
 
     private void OnDrawGizmos()

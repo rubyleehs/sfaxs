@@ -31,17 +31,19 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
         // Move between the two specified positions over the specified amount of time
         if (position != destination)
         {
-            transform.rotation = Quaternion.LookRotation(destination - position, Vector3.up);
+            Vector3 temp = destination - position;
+            temp.y = 0;
+            transform.rotation = Quaternion.LookRotation(temp, Vector3.up);
 
-            Vector3 p = transform.position;
+            temp = transform.position;
             float t = 0.0f;
             float movePeriod = Vector3.Distance(position, destination) / characterClass.moveSpeed;
 
             while (t < movePeriod)
             {
                 t += Time.deltaTime;
-                p = Vector3.Lerp(position, destination, t / movePeriod);
-                transform.position = p;
+                temp = Vector3.Lerp(position, destination, t / movePeriod);
+                transform.position = temp;
                 yield return null;
             }
         }

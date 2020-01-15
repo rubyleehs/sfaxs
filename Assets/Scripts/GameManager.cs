@@ -15,9 +15,6 @@ public class GameManager : MonoBehaviour
     public bool doGenerationAnimation = true;
     public Character character;
     public Vector2Int startPos;
-
-    public float movementRange = 10;
-    public float inclinedMovementEffortMultiplier;
     private Camera mainCam;
 
     private void Awake()
@@ -26,7 +23,7 @@ public class GameManager : MonoBehaviour
         else Destroy(this);
 
         mainCam = Camera.main;
-        terrainGenerator.Generate(randomSeed, doGenerationAnimation);
+        EnvironmentManager.instance.GenerateTerrain(randomSeed, doGenerationAnimation);
 
         Character selectedCharacter = Instantiate(character, transform);
         selectedCharacter.InitCharacter(EnvironmentManager.nodeMap[startPos.x, startPos.y]);
@@ -38,7 +35,7 @@ public class GameManager : MonoBehaviour
     {
         //Debug.Log(GameManager.instance);
         //if (Input.GetKeyDown(KeyCode.A)) terrainGenerator.Generate(randomSeed, doGenerationAnimation);
-        if (Input.GetButtonDown("Fire1")) Click();
+        Click();
     }
 
     private void Click()
@@ -54,32 +51,19 @@ public class GameManager : MonoBehaviour
                 if (SelectionManager.instance.currentlySelected != null)
                 {
                     Character selectedCharacter = SelectionManager.instance.currentlySelected as Character;
-                    if (selectedCharacter != null) selectedCharacter.TryGoTo(terrainGenerator.ConvertVectorToNode(hit.point));
+
+                    if (selectedCharacter != null)
+                    {
+                        EnvironmentManager.instance.RefreshPathLine(Pathfinder.Solve(EnvironmentManager.allNodes, selectedCharacter.currentNode, EnvironmentManager.ConvertVectorToNode(hit.point), selectedCharacter.PathfindingD, selectedCharacter.PathfindingH));
+                        if (Input.GetButtonDown("Fire1")) selectedCharacter.TryGoTo(EnvironmentManager.ConvertVectorToNode(hit.point));
+                    }
                 }
             }
         }
-        else
+        else if (Input.GetButtonDown("Fire1"))
         {
             EnvironmentManager.instance.RefreshMovementRangeProjection(null, Vector2Int.zero); //click Manager???
+            EnvironmentManager.instance.RefreshPathLine(null);
         }
     }
-
-
-    //Should be on the character themselves
-    public float PathfindingD(EnvironmentNode n1, EnvironmentNode n2)
-    {
-
-        float cost; //= Mathf.Sqrt(Vector2.SqrMagnitude(n1.indexPosition - n2.indexPosition) + ((n2.effortWeightage < n1.effortWeightage) ? 0 : Mathf.Pow((n2.effortWeightage - n1.effortWeightage) *uphillMovementWeightageMultiplier, 2)));
-        cost = Vector2.Distance(n1.indexPosition, n2.indexPosition);
-        if (n2.terrain.Contains(TerrainType.Water)) return cost * 2f;
-        cost += (n2.effortWeightage - n1.effortWeightage) * inclinedMovementEffortMultiplier;
-        //Debug.Log((n2.effortWeightage - n1.effortWeightage) * uphillMovementWeightageMultiplier);
-        if (n2.terrain.Contains(TerrainType.Trees)) cost *= 1.5f;
-        return cost;
-    }
-    public float PathfindingH(EnvironmentNode n1, EnvironmentNode n2)
-    {
-        return Mathf.Sqrt(Vector2.SqrMagnitude(n1.indexPosition - n2.indexPosition) + Mathf.Pow(n2.effortWeightage - n1.effortWeightage, 2));
-    }
-
 }

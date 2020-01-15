@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class EnvironmentManager : MonoBehaviour
 {
+    public EnvironmentTerrainGenerator terrainGenerator;
+
     [Header("Statics")]
     public static EnvironmentManager instance;
     public static Vector3 trueOrigin;
@@ -14,6 +16,10 @@ public class EnvironmentManager : MonoBehaviour
     public static float trueCoastLineLevel;
     public static EnvironmentNode[,] nodeMap;
     public static List<EnvironmentNode> allNodes = new List<EnvironmentNode>();
+
+    [Header("Path Line")]
+    public LineRenderer pathRenderer;
+    public float pathlineDeltaHeight = 5;
 
     [Header("Grid Lines")]
     public bool showGridLines = true;
@@ -34,14 +40,14 @@ public class EnvironmentManager : MonoBehaviour
     {
         if (instance == null) instance = this;
         else Destroy(this);
+    }
+
+    public void GenerateTerrain(int randomSeed, bool animateTerrainGeneration)
+    {
+        terrainGenerator.Generate(randomSeed, animateTerrainGeneration);
 
         RefreshGridLinesProjection();
         RefreshMovementRangeProjection(null, Vector2Int.zero);
-    }
-
-    private void Update()
-    {
-        //if (Input.GetKeyDown(KeyCode.A)) RefreshGridLinesProjection();
     }
 
     /// <summary>
@@ -54,9 +60,9 @@ public class EnvironmentManager : MonoBehaviour
             gridProjector = Instantiate(gridLinesProjectorPrefab, Vector3.zero, Quaternion.Euler(Vector3.right * 90), projectorsParent).GetComponent<Projector>();
         }
         gridProjector.enabled = showGridLines;
-        gridProjector.transform.position = new Vector3(gridProjectorOffset.x, projectorsHeight, gridProjectorOffset.y) + new Vector3(EnvironmentManager.trueCellSize.x * 0.5f, 0, EnvironmentManager.trueCellSize.y * 0.5f);
-        gridProjector.orthographicSize = EnvironmentManager.trueCellSize.y * 0.5f;
-        gridProjector.aspectRatio = EnvironmentManager.trueCellSize.x / EnvironmentManager.trueCellSize.y;
+        gridProjector.transform.position = new Vector3(gridProjectorOffset.x, projectorsHeight, gridProjectorOffset.y) + new Vector3(trueCellSize.x * 0.5f, 0, trueCellSize.y * 0.5f);
+        gridProjector.orthographicSize = trueCellSize.y * 0.5f;
+        gridProjector.aspectRatio = trueCellSize.x / trueCellSize.y;
     }
     public void RefreshMovementRangeProjection(bool[,] map, Vector2Int center)
     {
@@ -67,10 +73,10 @@ public class EnvironmentManager : MonoBehaviour
         }
         else moveRangeProjector.enabled = true;
         ProjectorTextureCreator.UpdateTexture(ref moveRangeTexture, map, (a) => a, moveRangeColor, Vector2Int.one);
-        Vector3 temp = EnvironmentManager.nodeMap[center.x, center.y].position;
+        Vector3 temp = nodeMap[center.x, center.y].position;
         moveRangeProjector.transform.position = new Vector3(temp.x, projectorsHeight, temp.z);
-        moveRangeProjector.orthographicSize = (map.GetLength(1) + 2) * 0.5f * EnvironmentManager.trueCellSize.y;
-        moveRangeProjector.aspectRatio = ((map.GetLength(0) + 2) * EnvironmentManager.trueCellSize.x) / ((map.GetLength(1) + 2) * EnvironmentManager.trueCellSize.y);
+        moveRangeProjector.orthographicSize = (map.GetLength(1) + 2) * 0.5f * trueCellSize.y;
+        moveRangeProjector.aspectRatio = ((map.GetLength(0) + 2) * trueCellSize.x) / ((map.GetLength(1) + 2) * trueCellSize.y);
     }
 
     public void RefreshMovementRangeProjection(HashSet<EnvironmentNode> nodes, EnvironmentNode center)
@@ -96,5 +102,34 @@ public class EnvironmentManager : MonoBehaviour
         }
 
         RefreshMovementRangeProjection(b, center.indexPosition);
+    }
+
+    public void RefreshPathLine(List<EnvironmentNode> path, bool willSink = false)
+    {
+        if (path == null)
+        {
+            pathRenderer.enabled = false;
+            return;
+        }
+        pathRenderer.enabled = true;
+        pathRenderer.positionCount = path.Count;
+
+        for (int i = 0; i < path.Count; i++)
+        {
+            pathRenderer.SetPosition(i, path[i].position + Vector3.up * Mathf.Max(pathlineDeltaHeight, trueWaterLevel - path[i].position.y));
+        }
+
+    }
+
+    /// <summary>
+    /// Converts a world space vector to it's associated EnviromentNode
+    /// </summary>
+    public static EnvironmentNode ConvertVectorToNode(Vector3 point)
+    {
+        point -= trueOrigin;
+        int x = (int)(point.x / EnvironmentManager.trueCellSize.x + 0.5f);
+        int z = (int)(point.z / EnvironmentManager.trueCellSize.y + 0.5f);
+
+        return EnvironmentManager.nodeMap[x, z];
     }
 }
