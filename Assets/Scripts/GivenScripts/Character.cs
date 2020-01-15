@@ -10,8 +10,9 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
     public EnvironmentNode currentNode { get; set; }
     public int teamId { get; set; } = -1;
     public int currentHp { get; set; }
-
     public HashSet<EnvironmentNode> nodesInRange;
+
+
 
     public void InitCharacter(EnvironmentNode startNode, int teamId = -1)
     {
@@ -31,16 +32,19 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
         // Move between the two specified positions over the specified amount of time
         if (position != destination)
         {
-            transform.rotation = Quaternion.LookRotation(destination - position, Vector3.up);
+            if (!characterClass.willSink) destination.y = Mathf.Max(destination.y, EnvironmentManager.trueWaterLevel);
+            Vector3 temp = destination - position;
+            temp.y = 0;
+            transform.rotation = Quaternion.LookRotation(temp, Vector3.up);
 
-            Vector3 p = transform.position;
+            temp = transform.position;
             float t = 0.0f;
-
-            while (t < characterClass.movePeriod)
+            float movePeriod = Vector3.Distance(position, destination) / characterClass.moveSpeed;
+            while (t < movePeriod)
             {
                 t += Time.deltaTime;
-                p = Vector3.Lerp(position, destination, t / characterClass.movePeriod);
-                transform.position = p;
+                temp = Vector3.Lerp(position, destination, t / movePeriod);
+                transform.position = temp;
                 yield return null;
             }
         }
@@ -57,7 +61,6 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
                 Vector3 next = route[count].position;
                 yield return DoMove(position, next);
                 currentNode = route[count];
-                Debug.Log(currentNode.indexPosition);
                 position = next;
             }
         }
@@ -75,8 +78,8 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
 
     public void TryGoTo(EnvironmentNode n)
     {
-        if (nodesInRange == null) nodesInRange = Pathfinder.IsInRange(EnvironmentTerrainGenerator.allNodes, currentNode, characterClass.moveRange, PathfindingD);
-        if (nodesInRange.Contains(n)) GoTo(Pathfinder.Solve(EnvironmentTerrainGenerator.allNodes, currentNode, n, PathfindingD, PathfindingH));
+        if (nodesInRange == null) nodesInRange = Pathfinder.IsInRange(EnvironmentManager.allNodes, currentNode, characterClass.moveRange, PathfindingD);
+        if (nodesInRange.Contains(n)) GoTo(Pathfinder.Solve(EnvironmentManager.allNodes, currentNode, n, PathfindingD, PathfindingH));
 
         SelectionManager.instance.Deselect();
     }
@@ -94,10 +97,11 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
     }
     public float PathfindingH(EnvironmentNode n1, EnvironmentNode n2)
     {
-        return Mathf.Sqrt(Vector2.SqrMagnitude(n1.indexPosition - n2.indexPosition) + Mathf.Pow(n2.effortWeightage - n1.effortWeightage, 2));
+        return (Vector2.Distance(n1.indexPosition, n2.indexPosition) + (n2.effortWeightage - n1.effortWeightage) * characterClass.inclinedMovementEffortMultiplier) * 0.3f;
     }
     public void OnPointerClick(PointerEventData eventData)
     {
+        Debug.Log("Click Detected");
         SelectionManager.instance.Select(this);
     }
     public void NotifySelectionManager()
@@ -107,12 +111,13 @@ public class Character : MonoBehaviour, IPointerClickHandler, ISelectable
     public void OnSelect()
     {
         Debug.Log("Selected!");
-        if (nodesInRange == null) nodesInRange = Pathfinder.IsInRange(EnvironmentTerrainGenerator.allNodes, currentNode, characterClass.moveRange, PathfindingD);
-        EnviromentProjectorManager.instance.RefreshMovementRangeProjection(nodesInRange, currentNode);
+        if (nodesInRange == null) nodesInRange = Pathfinder.IsInRange(EnvironmentManager.allNodes, currentNode, characterClass.moveRange, PathfindingD);
+        EnvironmentManager.instance.RefreshMovementRangeProjection(nodesInRange, currentNode);
     }
     public void OnDeselect()
     {
-        EnviromentProjectorManager.instance.RefreshMovementRangeProjection(null, currentNode.indexPosition);
+        EnvironmentManager.instance.RefreshMovementRangeProjection(null, currentNode.indexPosition);
+        EnvironmentManager.instance.RefreshPathLine(null);
         Debug.Log("Deselected!");
     }
 }

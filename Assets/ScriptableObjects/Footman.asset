@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hp: 100
   moveRange: 6
-  movePeriod: 0.5
+  moveSpeed: 25
   inclinedMovementEffortMultiplier: 9
+  willSink: 0
   I_navigatableTerrainWeightages:
   - type: 0
     value: 2.5

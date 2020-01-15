@@ -6,8 +6,9 @@ using UnityEngine;
 public class CharacterClass : ScriptableObject
 {
     public int hp;
-    public float moveRange, movePeriod = 0.5f;
+    public float moveRange, moveSpeed = 0.5f;
     public float inclinedMovementEffortMultiplier;
+    public bool willSink;
 
     [SerializeField] private List<TerrainFloatStrut> I_navigatableTerrainWeightages; //Only so it is editable from unity inspector, no input validation
     [SerializeField] private List<TerrainType> I_unnavigatableTerrain;

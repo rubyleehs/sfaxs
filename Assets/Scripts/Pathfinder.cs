@@ -20,7 +20,7 @@ public class Pathfinder : MonoBehaviour
     /// <returns>Returns a path from a starting node to an ending node using A*</returns>
     public static List<T> Solve<T>(List<T> map, T begin, T destination, Func<T, T, float> distance, Func<T, T, float> heuristic) where T : IPathfinderNode
     {
-        Debug.Log("Pf Start");
+        //Debug.Log("Pf Start");
         //Nothing to solve if null, they are the same, or have a direct connection.
         if (begin == null || destination == null)
         {
@@ -29,7 +29,7 @@ public class Pathfinder : MonoBehaviour
         }
         if (object.ReferenceEquals(begin, destination) || begin.connections.Contains(destination))
         {
-            Debug.LogFormat("Direct Connection: {0} <-> {1} found", begin, destination);
+            //Debug.LogFormat("Direct Connection: {0} <-> {1} found", begin, destination);
             return new List<T> { begin, destination };
         }
 
@@ -107,7 +107,7 @@ public class Pathfinder : MonoBehaviour
             result.Add(routeNode);
             result.Reverse();
 
-            Debug.LogFormat("Path Found: {0} steps {1} long", result.Count, destination.local);
+            //Debug.LogFormat("Path Found: {0} steps {1} long", result.Count, destination.local);
         }
         else Debug.LogWarning("Path Not Found");
 
@@ -115,6 +115,7 @@ public class Pathfinder : MonoBehaviour
 
         return result;
     }
+
 
     public static HashSet<T> IsInRange<T>(List<T> map, T begin, float range, Func<T, T, float> rangeFunc) where T : IPathfinderNode
     {
